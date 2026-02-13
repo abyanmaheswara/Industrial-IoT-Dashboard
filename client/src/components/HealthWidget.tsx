@@ -22,14 +22,14 @@ export const HealthWidget: React.FC<HealthWidgetProps> = ({ sensors, aiEnabled }
     };
 
     return (
-        <div className="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 transition-colors">
             <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-bold text-gray-100 flex items-center gap-2">
-                    <Brain className="w-6 h-6 text-purple-400" />
+                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                    <Brain className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                     AI System Insights
                 </h3>
                 {aiEnabled && (
-                    <span className="px-2 py-1 bg-purple-900/50 text-purple-300 text-xs rounded-full border border-purple-500/30">
+                    <span className="px-2 py-1 bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 text-xs rounded-full border border-purple-200 dark:border-purple-500/30">
                         Active
                     </span>
                 )}
@@ -37,28 +37,28 @@ export const HealthWidget: React.FC<HealthWidgetProps> = ({ sensors, aiEnabled }
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Health Score */}
-                <div className="flex flex-col items-center justify-center p-4 bg-gray-900/50 rounded-lg">
-                    <span className="text-gray-400 text-sm mb-2">Overall Machine Health</span>
+                <div className="flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg transition-colors">
+                    <span className="text-gray-600 dark:text-gray-400 text-sm mb-2">Overall Machine Health</span>
                     <div className={`text-5xl font-bold ${getHealthColor(avgHealth)}`}>
                         {avgHealth}%
                     </div>
-                    <div className="mt-2 text-xs text-center text-gray-500">
+                    <div className="mt-2 text-xs text-center text-gray-500 dark:text-gray-500">
                         Based on utilization & alerts
                     </div>
                 </div>
 
                 {/* Anomaly Monitor */}
                 <div className="flex flex-col gap-3">
-                    <div className="text-sm text-gray-400 mb-1">Detected Anomalies (Real-time)</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Detected Anomalies (Real-time)</div>
                     
                     {anomalies.length === 0 ? (
-                        <div className="flex items-center gap-2 p-3 bg-green-900/20 border border-green-800 rounded text-green-400 text-sm">
+                        <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded text-green-700 dark:text-green-400 text-sm transition-colors">
                             <CheckCircle size={16} />
                             <span>System operating normally.</span>
                         </div>
                     ) : (
                         anomalies.map(sensor => (
-                            <div key={sensor.id} className="flex items-center gap-2 p-3 bg-red-900/20 border border-red-800 rounded text-red-300 text-sm animate-pulse">
+                            <div key={sensor.id} className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-red-700 dark:text-red-300 text-sm animate-pulse transition-colors">
                                 <AlertTriangle size={16} />
                                 <span>
                                     <strong>{sensor.name}</strong>: Suspicious spike detected! (Z-Score: {sensor.zScore})

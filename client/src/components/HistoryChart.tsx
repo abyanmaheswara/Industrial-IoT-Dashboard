@@ -12,7 +12,7 @@ export const HistoryChart = ({ data, color = "#10b981" }: HistoryChartProps) => 
   
   if (!data || data.length === 0) {
     return (
-      <div className="h-full w-full flex items-center justify-center text-industrial-500">
+      <div className="h-full w-full flex items-center justify-center text-gray-500 dark:text-industrial-500">
         <p>Waiting for data history...</p>
       </div>
     );

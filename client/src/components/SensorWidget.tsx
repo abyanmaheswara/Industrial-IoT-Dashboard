@@ -55,10 +55,10 @@ export const SensorWidget = ({ data }: SensorWidgetProps) => {
       </div>
       
       <div>
-        <h3 className="text-industrial-400 text-sm font-medium mb-1">{data.name}</h3>
+        <h3 className="text-gray-600 dark:text-industrial-400 text-sm font-medium mb-1">{data.name}</h3>
         <div className="flex items-baseline">
-          <span className="text-3xl font-bold text-white tracking-tight">{data.value}</span>
-          <span className="ml-1 text-industrial-500 font-medium">{data.unit}</span>
+          <span className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">{data.value}</span>
+          <span className="ml-1 text-gray-500 dark:text-industrial-500 font-medium">{data.unit}</span>
         </div>
         {data.health !== undefined && (
             <div className="mt-2 w-full bg-gray-700 h-1.5 rounded-full overflow-hidden">

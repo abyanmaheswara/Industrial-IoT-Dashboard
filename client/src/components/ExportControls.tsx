@@ -48,7 +48,7 @@ export const ExportControls: React.FC<ExportControlsProps> = ({ sensorId }) => {
                 <button 
                     onClick={() => handleDownload('csv')}
                     disabled={!!loading}
-                    className="flex items-center gap-2 px-3 py-2 bg-industrial-700 hover:bg-industrial-600 text-industrial-100 rounded text-sm transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 px-3 py-2 bg-gray-700 dark:bg-industrial-700 hover:bg-gray-600 dark:hover:bg-industrial-600 text-gray-100 dark:text-industrial-100 rounded text-sm transition-colors disabled:opacity-50"
                 >
                     {loading === 'csv' ? <Loader className="animate-spin" size={16} /> : <Download size={16} />}
                     Export Excel
@@ -58,7 +58,7 @@ export const ExportControls: React.FC<ExportControlsProps> = ({ sensorId }) => {
             <button 
                 onClick={() => handleDownload('pdf')}
                 disabled={!!loading}
-                className="flex items-center gap-2 px-3 py-2 bg-blue-700 hover:bg-blue-600 text-white rounded text-sm transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white rounded text-sm transition-colors disabled:opacity-50"
             >
                 {loading === 'pdf' ? <Loader className="animate-spin" size={16} /> : <FileText size={16} />}
                 Download Report (PDF)
