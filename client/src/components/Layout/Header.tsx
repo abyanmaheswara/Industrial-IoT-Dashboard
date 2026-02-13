@@ -1,6 +1,46 @@
+import { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
+import { Bell, Settings as SettingsIcon, Moon, Sun, Monitor } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
 export function Header() {
+  const { user } = useAuth();
+  const { theme, setTheme } = useTheme();
+  const [avatar, setAvatar] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadAvatar = () => {
+      if (user?.username) {
+        const savedAvatar = localStorage.getItem(`avatar_${user.username}`);
+        if (savedAvatar) setAvatar(savedAvatar);
+      }
+    };
+
+    loadAvatar();
+
+    const handleAvatarUpdate = () => loadAvatar();
+    window.addEventListener('avatarUpdate', handleAvatarUpdate);
+    
+    return () => {
+      window.removeEventListener('avatarUpdate', handleAvatarUpdate);
+    };
+  }, [user]);
+
+  const toggleTheme = () => {
+    if (theme === 'light') setTheme('dark');
+    else if (theme === 'dark') setTheme('system');
+    else setTheme('light');
+  };
+
+  const ThemeIcon = () => {
+    if (theme === 'light') return <Sun className="w-5 h-5" />;
+    if (theme === 'dark') return <Moon className="w-5 h-5" />;
+    return <Monitor className="w-5 h-5" />;
+  }
+
   return (
-    <header className="h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-6">
+    <header className="h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-6 transition-colors duration-200">
       <div className="flex items-center gap-4">
         <div className="text-sm text-gray-600 dark:text-gray-400">
           <span className="font-medium text-gray-900 dark:text-white">
@@ -24,37 +64,45 @@ export function Header() {
 
       <div className="flex items-center gap-4">
         {/* System Status */}
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-green-100 dark:bg-green-900/20 rounded-full">
+        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-green-100 dark:bg-green-900/20 rounded-full">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
           <span className="text-sm font-medium text-green-700 dark:text-green-400">
             SYSTEM ONLINE
           </span>
         </div>
 
+        {/* Theme Toggle */}
+        <button 
+          onClick={toggleTheme}
+          className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+          title={`Current Theme: ${theme.charAt(0).toUpperCase() + theme.slice(1)}`}
+        >
+          <ThemeIcon />
+        </button>
+
         {/* Notifications */}
-        <button className="relative p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-          </svg>
+        <button className="relative p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+          <Bell className="w-6 h-6" />
           <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
         </button>
 
         {/* Settings */}
-        <button className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-        </button>
+        <Link to="/settings" className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+          <SettingsIcon className="w-6 h-6" />
+        </Link>
 
         {/* User Profile */}
         <div className="flex items-center gap-3 pl-4 border-l border-gray-200 dark:border-gray-700">
-          <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-            <span className="text-white font-bold">A</span>
+          <div className="w-10 h-10 bg-industrial-600 rounded-full flex items-center justify-center overflow-hidden border border-gray-200 dark:border-gray-600">
+             {avatar ? (
+                <img src={avatar} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+                <span className="text-white font-bold text-lg">{user?.username?.charAt(0).toUpperCase() || 'U'}</span>
+            )}
           </div>
-          <div className="text-sm">
-            <div className="font-medium text-gray-900 dark:text-white">admin</div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">Admin</div>
+          <div className="hidden md:block text-sm">
+            <div className="font-medium text-gray-900 dark:text-white">{user?.username || 'Guest'}</div>
+            <div className="text-xs text-gray-600 dark:text-gray-400 capitalize">{user?.role || 'Viewer'}</div>
           </div>
         </div>
       </div>
