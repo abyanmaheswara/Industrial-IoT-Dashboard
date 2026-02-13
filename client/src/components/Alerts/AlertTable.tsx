@@ -66,8 +66,8 @@ export const AlertTable: React.FC<AlertTableProps> = ({ alerts, onRefresh }) => 
                             </tr>
                         ) : (
                             currentAlerts.map((alert) => (
-                                <tr key={alert.id} className="hover:bg-gray-50 dark:hover:bg-industrial-800/50 transition-colors">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-industrial-300">
+                                <tr key={alert.id} className="hover:bg-gray-100 dark:hover:bg-gray-700/30 transition-colors">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                                         {new Date(alert.created_at).toLocaleTimeString()} <span className="text-gray-500 dark:text-industrial-500 text-xs ml-1">{new Date(alert.created_at).toLocaleDateString()}</span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">

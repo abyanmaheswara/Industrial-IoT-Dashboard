@@ -27,7 +27,7 @@ export const AlertFilters: React.FC<AlertFiltersProps> = ({
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search alerts by sensor name or ID..." 
-                    className="w-full pl-10 pr-4 py-2 bg-industrial-950 border border-industrial-800 rounded-md text-white focus:outline-none focus:border-blue-500 placeholder-industrial-600"
+                    className="w-full pl-10 pr-4 py-2 bg-white dark:bg-industrial-950 border border-gray-300 dark:border-industrial-800 rounded-md text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 placeholder-gray-400 dark:placeholder-industrial-600"
                 />
             </div>
             
@@ -36,8 +36,8 @@ export const AlertFilters: React.FC<AlertFiltersProps> = ({
                     onClick={() => setFilterType(filterType === 'all' ? 'warning' : 'all')}
                     className={`flex items-center space-x-2 px-3 py-2 rounded border transition-colors whitespace-nowrap ${
                         filterType === 'warning' 
-                            ? 'bg-yellow-900/30 border-yellow-600 text-yellow-500' 
-                            : 'bg-industrial-800 border-industrial-700 text-industrial-300 hover:text-white'
+                            ? 'bg-yellow-100 dark:bg-yellow-900/30 border-yellow-400 dark:border-yellow-600 text-yellow-700 dark:text-yellow-500' 
+                            : 'bg-gray-100 dark:bg-industrial-800 border-gray-300 dark:border-industrial-700 text-gray-700 dark:text-industrial-300 hover:text-gray-900 dark:hover:text-white'
                     }`}
                 >
                     <Filter size={16} />
@@ -48,8 +48,8 @@ export const AlertFilters: React.FC<AlertFiltersProps> = ({
                     onClick={() => setShowCriticalOnly(!showCriticalOnly)}
                     className={`px-3 py-2 border rounded text-sm whitespace-nowrap transition-colors flex items-center ${
                         showCriticalOnly 
-                            ? 'bg-red-900/30 border-red-600 text-red-500' 
-                            : 'bg-industrial-900 border-industrial-700 text-industrial-400 hover:bg-red-900/10 hover:text-red-400'
+                            ? 'bg-red-100 dark:bg-red-900/30 border-red-400 dark:border-red-600 text-red-700 dark:text-red-500' 
+                            : 'bg-gray-100 dark:bg-industrial-900 border-gray-300 dark:border-industrial-700 text-gray-700 dark:text-industrial-400 hover:bg-red-50 dark:hover:bg-red-900/10 hover:text-red-600 dark:hover:text-red-400'
                     }`}
                 >
                     <AlertTriangle size={16} className="mr-2" />
