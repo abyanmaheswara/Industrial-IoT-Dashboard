@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-industrial-50: #f4f6f8;
+  --color-industrial-100: #e4e7eb;
+  --color-industrial-200: #c5ced6;
+  --color-industrial-300: #a6b5c1;
+  --color-industrial-400: #879cac;
+  --color-industrial-500: #688397;
+  --color-industrial-600: #536979;
+  --color-industrial-700: #3e4f5b;
+  --color-industrial-800: #2a343c;
+  --color-industrial-900: #151a1e;
+  --color-industrial-950: #0b0d0f;
+
+  --color-alert-success: #10b981;
+  --color-alert-warning: #f59e0b;
+  --color-alert-critical: #ef4444;
+
+  --font-sans: Inter, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+@layer base {
+  body {
+    @apply bg-industrial-950 text-industrial-100 font-sans antialiased;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-industrial-900/95 border border-industrial-800 rounded-lg shadow-lg backdrop-blur-sm;
+  }
+  
+  .btn {
+    @apply px-4 py-2 rounded-md font-medium transition-colors duration-200 outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-industrial-950;
+  }
+  
+  .btn-primary {
+    @apply bg-industrial-600 hover:bg-industrial-500 text-white focus:ring-industrial-500;
+  }
+
+  .status-indicator {
+    @apply w-2.5 h-2.5 rounded-full inline-block mr-2;
+  }
+}
