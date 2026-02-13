@@ -59,10 +59,15 @@ export const Alerts: React.FC = () => {
 
     if (searchQuery) {
         const lowerQuery = searchQuery.toLowerCase();
-        result = result.filter(a => 
-            a.message.toLowerCase().includes(lowerQuery) || 
-            a.sensor_id.toLowerCase().includes(lowerQuery)
-        );
+        result = result.filter(a => {
+            const message = (a.message || '').toLowerCase();
+            const sensorId = (a.sensor_id || '').toLowerCase();
+            const sensorName = (a.sensor_name || '').toLowerCase();
+            
+            return message.includes(lowerQuery) || 
+                   sensorId.includes(lowerQuery) || 
+                   sensorName.includes(lowerQuery);
+        });
     }
     
     setDisplayedAlerts(result);
