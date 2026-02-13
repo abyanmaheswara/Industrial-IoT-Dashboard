@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, Eye } from 'lucide-react';
+import { CheckCircle, Eye, Check, AlertCircle } from 'lucide-react';
 
 interface AlertTableProps {
     alerts: any[];
@@ -46,75 +46,110 @@ export const AlertTable: React.FC<AlertTableProps> = ({ alerts, onRefresh }) => 
     return (
         <div className="card overflow-hidden">
             <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                    <thead className="bg-gray-100 dark:bg-industrial-900 text-gray-700 dark:text-industrial-400 text-xs uppercase font-medium">
-                        <tr>
-                            <th className="px-6 py-3 tracking-wider">Timestamp</th>
-                            <th className="px-6 py-3 tracking-wider">Sensor</th>
-                            <th className="px-6 py-3 tracking-wider">Severity</th>
-                            <th className="px-6 py-3 tracking-wider">Message</th>
-                            <th className="px-6 py-3 tracking-wider">Status</th>
-                            <th className="px-6 py-3 tracking-wider">Actions</th>
+                <table className="w-full">
+                    <thead>
+                        <tr className="border-b-2 border-gray-200 dark:border-gray-700">
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Time</th>
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Sensor</th>
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Severity</th>
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Message</th>
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                            <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200 dark:divide-industrial-800">
+                    <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                         {currentAlerts.length === 0 ? (
                             <tr>
-                                <td colSpan={6} className="px-6 py-8 text-center text-gray-500 dark:text-industrial-400">
-                                    No alerts found
+                                <td colSpan={6} className="px-6 py-12 text-center">
+                                    <AlertCircle className="w-12 h-12 mx-auto mb-3 text-gray-400 dark:text-gray-600" />
+                                    <p className="text-gray-500 dark:text-gray-400 font-medium">No alerts found</p>
+                                    <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">All systems operating normally</p>
                                 </td>
                             </tr>
                         ) : (
                             currentAlerts.map((alert) => (
-                                <tr key={alert.id} className="hover:bg-gray-100 dark:hover:bg-gray-700/30 transition-colors">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                                        {new Date(alert.created_at).toLocaleTimeString()} <span className="text-gray-500 dark:text-industrial-500 text-xs ml-1">{new Date(alert.created_at).toLocaleDateString()}</span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                        {alert.sensor_name || alert.sensor_id}
+                                <tr key={alert.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-all duration-150">
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                                            {new Date(alert.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                        </div>
+                                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                                            {new Date(alert.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                            alert.type === 'critical' ? 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-500/30' : 'bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30'
-                                        }`}>
-                                            {alert.type.toUpperCase()}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 text-sm text-gray-700 dark:text-industrial-300">
-                                        {alert.message}
+                                        <div className="flex items-center">
+                                            <div className="w-2 h-2 rounded-full mr-2 bg-blue-500"></div>
+                                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                                                {alert.sensor_name || alert.sensor_id}
+                                            </span>
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                         <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                            alert.status === 'active' ? 'bg-red-500 text-white animate-pulse' : 
-                                            alert.status === 'acknowledged' ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400' : 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400'
-                                        }`}>
-                                            {alert.status.toUpperCase()}
-                                        </span>
+                                        {alert.type === 'critical' ? (
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-red-500 to-red-600 text-white shadow-sm">
+                                                <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+                                                CRITICAL
+                                            </span>
+                                        ) : (
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-amber-400 to-amber-500 text-white shadow-sm">
+                                                <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
+                                                WARNING
+                                            </span>
+                                        )}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <div className="flex space-x-2">
+                                    <td className="px-6 py-4">
+                                        <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2">
+                                            {alert.message}
+                                        </p>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        {alert.status === 'active' ? (
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800">
+                                                <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>
+                                                Active
+                                            </span>
+                                        ) : alert.status === 'acknowledged' ? (
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
+                                                <CheckCircle size={12} />
+                                                Acknowledged
+                                            </span>
+                                        ) : (
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800">
+                                                <Check size={12} />
+                                                Resolved
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                                        <div className="flex justify-end gap-2">
                                             {alert.status !== 'resolved' && (
                                                 <>
                                                     {alert.status === 'active' && (
                                                         <button 
                                                             onClick={() => handleAction(alert.id, 'acknowledge')}
-                                                            className="p-1 hover:text-blue-600 dark:hover:text-blue-400 text-gray-600 dark:text-industrial-400 transition-colors" 
+                                                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-400 text-xs font-medium rounded-md transition-all duration-150 border border-blue-200 dark:border-blue-800"
                                                             title="Acknowledge"
                                                         >
-                                                            <CheckCircle size={18} />
+                                                            <CheckCircle size={14} />
+                                                            Ack
                                                         </button>
                                                     )}
                                                     <button 
                                                         onClick={() => handleAction(alert.id, 'resolve')}
-                                                        className="p-1 hover:text-green-600 dark:hover:text-green-400 text-gray-600 dark:text-industrial-400 transition-colors" 
+                                                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50 text-green-700 dark:text-green-400 text-xs font-medium rounded-md transition-all duration-150 border border-green-200 dark:border-green-800"
                                                         title="Resolve"
                                                     >
-                                                        <span className="text-xs border border-current px-1 rounded">Resolve</span>
+                                                        <Check size={14} />
+                                                        Resolve
                                                     </button>
                                                 </>
                                             )}
                                             {alert.status === 'resolved' && (
-                                                 <Eye size={18} className="text-gray-400 dark:text-industrial-600" />
+                                                <span className="inline-flex items-center gap-1 px-3 py-1.5 text-gray-400 dark:text-gray-600 text-xs">
+                                                    <Eye size={14} />
+                                                    Closed
+                                                </span>
                                             )}
                                         </div>
                                     </td>
@@ -124,38 +159,42 @@ export const AlertTable: React.FC<AlertTableProps> = ({ alerts, onRefresh }) => 
                     </tbody>
                 </table>
             </div>
-            <div className="bg-gray-50 dark:bg-industrial-900 px-6 py-3 border-t border-gray-200 dark:border-industrial-800 flex items-center justify-between">
-                <span className="text-xs text-gray-600 dark:text-industrial-400">
-                    Showing {startIndex + 1} to {Math.min(endIndex, alerts.length)} of {alerts.length} entries
-                </span>
-                <div className="flex space-x-1">
+            <div className="bg-gray-50 dark:bg-gray-900/50 px-6 py-4 border-t border-gray-200 dark:border-gray-800 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                        Showing <span className="font-semibold text-gray-900 dark:text-white">{startIndex + 1}</span> to <span className="font-semibold text-gray-900 dark:text-white">{Math.min(endIndex, alerts.length)}</span> of <span className="font-semibold text-gray-900 dark:text-white">{alerts.length}</span> alerts
+                    </span>
+                </div>
+                <div className="flex items-center gap-1">
                     <button 
                         onClick={handlePrevPage}
                         disabled={currentPage === 1}
-                        className="px-2 py-1 border border-gray-300 dark:border-industrial-700 rounded text-xs text-gray-700 dark:text-industrial-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-industrial-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="px-3 py-1.5 border border-gray-300 dark:border-gray-700 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-150"
                     >
-                        Prev
+                        Previous
                     </button>
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                        const pageNum = i + 1;
-                        return (
-                            <button 
-                                key={pageNum}
-                                onClick={() => setCurrentPage(pageNum)}
-                                className={`px-2 py-1 rounded text-xs transition-colors ${
-                                    currentPage === pageNum 
-                                        ? 'bg-blue-600 text-white' 
-                                        : 'border border-gray-300 dark:border-industrial-700 text-gray-700 dark:text-industrial-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-industrial-800'
-                                }`}
-                            >
-                                {pageNum}
-                            </button>
-                        );
-                    })}
+                    <div className="flex gap-1 mx-2">
+                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                            const pageNum = i + 1;
+                            return (
+                                <button 
+                                    key={pageNum}
+                                    onClick={() => setCurrentPage(pageNum)}
+                                    className={`w-8 h-8 rounded-md text-sm font-medium transition-all duration-150 ${
+                                        currentPage === pageNum 
+                                            ? 'bg-blue-600 text-white shadow-sm' 
+                                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-300 dark:border-gray-700'
+                                    }`}
+                                >
+                                    {pageNum}
+                                </button>
+                            );
+                        })}
+                    </div>
                     <button 
                         onClick={handleNextPage}
                         disabled={currentPage === totalPages || totalPages === 0}
-                        className="px-2 py-1 border border-gray-300 dark:border-industrial-700 rounded text-xs text-gray-700 dark:text-industrial-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-industrial-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="px-3 py-1.5 border border-gray-300 dark:border-gray-700 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-150"
                     >
                         Next
                     </button>
