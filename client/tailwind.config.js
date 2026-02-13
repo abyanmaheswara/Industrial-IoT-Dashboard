@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -8,22 +9,22 @@ export default {
     extend: {
       colors: {
         industrial: {
-          50: '#f4f6f8',
-          100: '#e4e7eb',
-          200: '#c5ced6',
-          300: '#a6b5c1',
-          400: '#879cac',
-          500: '#688397',
-          600: '#536979',
-          700: '#3e4f5b',
-          800: '#2a343c',
-          900: '#151a1e',
-          950: '#0b0d0f',
+          50:  'var(--color-industrial-50)',
+          100: 'var(--color-industrial-100)',
+          200: 'var(--color-industrial-200)',
+          300: 'var(--color-industrial-300)',
+          400: 'var(--color-industrial-400)',
+          500: 'var(--color-industrial-500)',
+          600: 'var(--color-industrial-600)',
+          700: 'var(--color-industrial-700)',
+          800: 'var(--color-industrial-800)',
+          900: 'var(--color-industrial-900)',
+          950: 'var(--color-industrial-950)',
         },
         alert: {
-          success: '#10b981', // green-500
-          warning: '#f59e0b', // amber-500
-          critical: '#ef4444', // red-500
+          success: 'var(--color-alert-success)',
+          warning: 'var(--color-alert-warning)',
+          critical: 'var(--color-alert-critical)',
         }
       },
       fontFamily: {

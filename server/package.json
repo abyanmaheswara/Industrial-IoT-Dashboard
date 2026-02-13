@@ -19,8 +19,18 @@
     "tailwindcss": "^4.1.18"
   },
   "dependencies": {
+    "aedes": "^1.0.0",
+    "aedes-server-factory": "^0.2.1",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "exceljs": "^4.4.0",
     "express": "^5.2.1",
+    "json2csv": "^6.0.0-alpha.2",
+    "jsonwebtoken": "^9.0.3",
+    "mqtt": "^5.15.0",
+    "pdfkit": "^0.17.2",
+    "pg": "^8.18.0",
     "socket.io": "^4.8.3"
   }
 }

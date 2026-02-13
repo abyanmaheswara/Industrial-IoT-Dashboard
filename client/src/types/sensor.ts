@@ -9,4 +9,8 @@ export interface SensorData {
   unit: string;
   timestamp: number;
   status: SensorStatus;
+  // AI Metrics
+  health?: number;
+  isAnomaly?: boolean;
+  zScore?: string;
 }

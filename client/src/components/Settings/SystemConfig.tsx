@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
-import { Moon, Sun, Monitor, Bell, Volume2, Globe } from 'lucide-react';
+import { Moon, Sun, Monitor, Volume2, Globe } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 
 export const SystemConfig: React.FC = () => {
-    const [theme, setTheme] = useState('dark');
+    const { theme, setTheme } = useTheme();
+    const [unit, setUnit] = useState(() => localStorage.getItem('tempUnit') || 'c');
+    
+    // Notifications state
     const [notifications, setNotifications] = useState({
         email: true,
         sms: false,
@@ -10,54 +14,104 @@ export const SystemConfig: React.FC = () => {
         sound: true
     });
 
+    // Theme handling is now managed by Context, we just call setTheme
+    const handleThemeChange = (newTheme: string) => {
+        setTheme(newTheme as 'light' | 'dark' | 'system');
+    };
+
+    // Persist Unit changes
+    const handleUnitChange = (newUnit: string) => {
+        setUnit(newUnit);
+        localStorage.setItem('tempUnit', newUnit);
+        // Dispatch event for other components to listen
+        window.dispatchEvent(new Event('unitChange'));
+        // Simple brute force update for now to reflect across app
+        window.location.reload(); 
+    };
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             {/* General Settings */}
             <div className="card p-6">
-                <h3 className="text-lg font-medium text-white mb-4 border-b border-industrial-800 pb-2">System Configuration</h3>
+                <h3 className="text-lg font-medium text-industrial-50 mb-4 border-b border-industrial-800 pb-2">System Configuration</h3>
                 
                 <div className="space-y-6">
-                    <div>
-                        <label className="block text-sm font-medium text-white mb-2">Theme Preference</label>
-                        <div className="flex space-x-4">
-                            <button 
-                                onClick={() => setTheme('light')}
-                                className={`flex-1 flex flex-col items-center justify-center p-3 rounded border ${theme === 'light' ? 'bg-industrial-800 border-blue-500 text-blue-500' : 'bg-industrial-900 border-industrial-800 text-industrial-400 hover:text-white'}`}
+                    <div className="mb-6">
+                        <label className="block text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">
+                            Theme Preference
+                        </label>
+                        <div className="grid grid-cols-3 gap-4">
+                            {/* Light Theme */}
+                            <button
+                                onClick={() => handleThemeChange('light')}
+                                className={`p-4 rounded-lg border-2 transition-all ${
+                                    theme === 'light'
+                                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                                    : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'
+                                }`}
                             >
-                                <Sun size={24} className="mb-2" />
-                                <span className="text-xs">Light</span>
+                                <div className="flex flex-col items-center gap-2">
+                                    <Sun className="w-6 h-6" />
+                                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                        Light
+                                    </span>
+                                </div>
                             </button>
-                            <button 
-                                onClick={() => setTheme('dark')}
-                                className={`flex-1 flex flex-col items-center justify-center p-3 rounded border ${theme === 'dark' ? 'bg-industrial-800 border-blue-500 text-blue-500' : 'bg-industrial-900 border-industrial-800 text-industrial-400 hover:text-white'}`}
+
+                            {/* Dark Theme */}
+                            <button
+                                onClick={() => handleThemeChange('dark')}
+                                className={`p-4 rounded-lg border-2 transition-all ${
+                                    theme === 'dark'
+                                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                                    : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'
+                                }`}
                             >
-                                <Moon size={24} className="mb-2" />
-                                <span className="text-xs">Dark</span>
+                                <div className="flex flex-col items-center gap-2">
+                                    <Moon className="w-6 h-6" />
+                                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                        Dark
+                                    </span>
+                                </div>
                             </button>
-                            <button 
-                                onClick={() => setTheme('system')}
-                                className={`flex-1 flex flex-col items-center justify-center p-3 rounded border ${theme === 'system' ? 'bg-industrial-800 border-blue-500 text-blue-500' : 'bg-industrial-900 border-industrial-800 text-industrial-400 hover:text-white'}`}
+
+                            {/* System Theme */}
+                            <button
+                                onClick={() => handleThemeChange('system')}
+                                className={`p-4 rounded-lg border-2 transition-all ${
+                                    theme === 'system'
+                                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                                    : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'
+                                }`}
                             >
-                                <Monitor size={24} className="mb-2" />
-                                <span className="text-xs">System</span>
+                                <div className="flex flex-col items-center gap-2">
+                                    <Monitor className="w-6 h-6" />
+                                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                        System
+                                    </span>
+                                </div>
                             </button>
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-white mb-2">Refresh Interval</label>
-                            <select className="w-full bg-industrial-900 border border-industrial-800 text-white text-sm rounded px-3 py-2 focus:outline-none focus:border-blue-500">
+                            <label className="block text-sm font-medium text-industrial-300 mb-2">Refresh Interval</label>
+                            <select className="w-full bg-industrial-900 border border-industrial-800 text-industrial-100 text-sm rounded px-3 py-2 focus:outline-none focus:border-blue-500" defaultValue="5">
                                 <option value="1">1 Second</option>
                                 <option value="2">2 Seconds</option>
-                                <option value="5" selected>5 Seconds</option>
+                                <option value="5">5 Seconds</option>
                                 <option value="10">10 Seconds</option>
                             </select>
                         </div>
                         <div>
-                             <label className="block text-sm font-medium text-white mb-2">Temperature Unit</label>
-                            <select className="w-full bg-industrial-900 border border-industrial-800 text-white text-sm rounded px-3 py-2 focus:outline-none focus:border-blue-500">
-                                <option value="c" selected>Celsius (°C)</option>
+                             <label className="block text-sm font-medium text-industrial-300 mb-2">Temperature Unit</label>
+                            <select 
+                                className="w-full bg-industrial-900 border border-industrial-800 text-industrial-100 text-sm rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                                value={unit}
+                                onChange={(e) => handleUnitChange(e.target.value)}
+                            >
+                                <option value="c">Celsius (°C)</option>
                                 <option value="f">Fahrenheit (°F)</option>
                                 <option value="k">Kelvin (K)</option>
                             </select>
@@ -65,14 +119,14 @@ export const SystemConfig: React.FC = () => {
                     </div>
                     
                     <div>
-                         <label className="block text-sm font-medium text-white mb-2">Time Zone</label>
-                         <div className="flex items-center bg-industrial-900 border border-industrial-800 rounded px-3 py-2 text-white">
+                         <label className="block text-sm font-medium text-industrial-300 mb-2">Time Zone</label>
+                         <div className="flex items-center bg-industrial-900 border border-industrial-800 rounded px-3 py-2 text-industrial-100">
                              <Globe size={16} className="mr-2 text-industrial-500" />
-                             <select className="bg-transparent w-full focus:outline-none text-sm">
-                                 <option>UTC-08:00 Pacific Time</option>
-                                 <option>UTC-05:00 Eastern Time</option>
-                                 <option selected>UTC+00:00 Coordinated Universal Time</option>
-                                 <option>UTC+07:00 Western Indonesia Time</option>
+                             <select className="bg-transparent w-full focus:outline-none text-sm text-industrial-100" defaultValue="UTC+00:00">
+                                 <option value="UTC-08:00">UTC-08:00 Pacific Time</option>
+                                 <option value="UTC-05:00">UTC-05:00 Eastern Time</option>
+                                 <option value="UTC+00:00">UTC+00:00 Coordinated Universal Time</option>
+                                 <option value="UTC+07:00">UTC+07:00 Western Indonesia Time</option>
                              </select>
                          </div>
                     </div>
@@ -81,7 +135,7 @@ export const SystemConfig: React.FC = () => {
 
             {/* Notification Settings */}
             <div className="card p-6">
-                <h3 className="text-lg font-medium text-white mb-4 border-b border-industrial-800 pb-2">Notifications</h3>
+                <h3 className="text-lg font-medium text-industrial-50 mb-4 border-b border-industrial-800 pb-2">Notifications</h3>
                 
                 <div className="space-y-4">
                     <div className="flex items-center justify-between p-3 bg-industrial-900 rounded border border-industrial-800">
@@ -90,7 +144,7 @@ export const SystemConfig: React.FC = () => {
                                 <Monitor size={18} />
                             </div>
                             <div>
-                                <p className="text-sm font-medium text-white">In-App Notifications</p>
+                                <p className="text-sm font-medium text-industrial-100">In-App Notifications</p>
                                 <p className="text-xs text-industrial-400">Show popups when dashboard is open</p>
                             </div>
                         </div>
@@ -112,7 +166,7 @@ export const SystemConfig: React.FC = () => {
                                 <Volume2 size={18} />
                             </div>
                              <div>
-                                <p className="text-sm font-medium text-white">Sound Alerts</p>
+                                <p className="text-sm font-medium text-industrial-100">Sound Alerts</p>
                                 <p className="text-xs text-industrial-400">Play sound on critical alerts</p>
                             </div>
                         </div>
@@ -127,6 +181,19 @@ export const SystemConfig: React.FC = () => {
                             <label className={`toggle-label block overflow-hidden h-5 rounded-full cursor-pointer ${notifications.sound ? 'bg-blue-600' : 'bg-industrial-700'}`}></label>
                         </div>
                     </div>
+                </div>
+
+                <div className="mt-6 pt-4 border-t border-industrial-800 flex justify-end">
+                    <button 
+                        onClick={() => {
+                            if(confirm("Reset all notifications to default?")){
+                                setNotifications({ email: true, sms: false, push: true, sound: true });
+                            }
+                        }}
+                        className="text-xs text-industrial-400 hover:text-industrial-100 underline"
+                    >
+                        Reset to Defaults
+                    </button>
                 </div>
             </div>
         </div>

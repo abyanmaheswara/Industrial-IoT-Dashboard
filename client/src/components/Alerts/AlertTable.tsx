@@ -1,15 +1,27 @@
 import React from 'react';
-import { MoreVertical, CheckCircle, Eye } from 'lucide-react';
+import { CheckCircle, Eye } from 'lucide-react';
 
-const MOCK_ALERTS = [
-    { id: 1, timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(), sensor: 'Pressure Main', type: 'Critical', message: 'Pressure exceeded safe limit (9.2 bar)', status: 'Active' },
-    { id: 2, timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString(), sensor: 'Vibration Motor', type: 'Warning', message: 'High vibration detected (11.5 mm/s)', status: 'Acknowledged' },
-    { id: 3, timestamp: new Date(Date.now() - 1000 * 60 * 45).toISOString(), sensor: 'Temp Unit B', type: 'Warning', message: 'Temperature rising fast', status: 'Resolved' },
-    { id: 4, timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), sensor: 'Power Unit 1', type: 'Critical', message: 'Power surge detected', status: 'Resolved' },
-    { id: 5, timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), sensor: 'Hydraulic Pump', type: 'Warning', message: 'Oil level low', status: 'Resolved' },
-];
+interface AlertTableProps {
+    alerts: any[];
+    onRefresh: () => void;
+}
 
-export const AlertTable: React.FC = () => {
+export const AlertTable: React.FC<AlertTableProps> = ({ alerts, onRefresh }) => {
+
+    const handleAction = async (id: number, action: 'acknowledge' | 'resolve') => {
+        try {
+            const status = action === 'acknowledge' ? 'acknowledged' : 'resolved';
+            await fetch(`http://localhost:3001/api/alerts/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status })
+            });
+            onRefresh();
+        } catch (err) {
+            console.error("Failed to update alert:", err);
+        }
+    };
+
     return (
         <div className="card overflow-hidden">
             <div className="overflow-x-auto">
@@ -25,19 +37,19 @@ export const AlertTable: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-industrial-800">
-                        {MOCK_ALERTS.map((alert) => (
+                        {alerts.map((alert) => (
                             <tr key={alert.id} className="hover:bg-industrial-800/50 transition-colors">
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-industrial-300">
-                                    {new Date(alert.timestamp).toLocaleTimeString()} <span className="text-industrial-500 text-xs ml-1">{new Date(alert.timestamp).toLocaleDateString()}</span>
+                                    {new Date(alert.created_at).toLocaleTimeString()} <span className="text-industrial-500 text-xs ml-1">{new Date(alert.created_at).toLocaleDateString()}</span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
-                                    {alert.sensor}
+                                    {alert.sensor_name || alert.sensor_id}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                        alert.type === 'Critical' ? 'bg-red-900/50 text-red-400 border border-red-500/30' : 'bg-amber-900/50 text-amber-400 border border-amber-500/30'
+                                        alert.type === 'critical' ? 'bg-red-900/50 text-red-400 border border-red-500/30' : 'bg-amber-900/50 text-amber-400 border border-amber-500/30'
                                     }`}>
-                                        {alert.type}
+                                        {alert.type.toUpperCase()}
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 text-sm text-industrial-300">
@@ -45,20 +57,37 @@ export const AlertTable: React.FC = () => {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                        alert.status === 'Active' ? 'bg-red-500 text-white animate-pulse' : 
-                                        alert.status === 'Acknowledged' ? 'bg-blue-900/50 text-blue-400' : 'bg-green-900/50 text-green-400'
+                                        alert.status === 'active' ? 'bg-red-500 text-white animate-pulse' : 
+                                        alert.status === 'acknowledged' ? 'bg-blue-900/50 text-blue-400' : 'bg-green-900/50 text-green-400'
                                     }`}>
-                                        {alert.status}
+                                        {alert.status.toUpperCase()}
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div className="flex space-x-2">
-                                        <button className="p-1 hover:text-white text-industrial-400 transition-colors" title="View Details">
-                                            <Eye size={18} />
-                                        </button>
-                                        <button className="p-1 hover:text-blue-400 text-industrial-400 transition-colors" title="Acknowledge">
-                                            <CheckCircle size={18} />
-                                        </button>
+                                        {alert.status !== 'resolved' && (
+                                            <>
+                                                {alert.status === 'active' && (
+                                                    <button 
+                                                        onClick={() => handleAction(alert.id, 'acknowledge')}
+                                                        className="p-1 hover:text-blue-400 text-industrial-400 transition-colors" 
+                                                        title="Acknowledge"
+                                                    >
+                                                        <CheckCircle size={18} />
+                                                    </button>
+                                                )}
+                                                <button 
+                                                    onClick={() => handleAction(alert.id, 'resolve')}
+                                                    className="p-1 hover:text-green-400 text-industrial-400 transition-colors" 
+                                                    title="Resolve"
+                                                >
+                                                    <span className="text-xs border border-current px-1 rounded">Resolve</span>
+                                                </button>
+                                            </>
+                                        )}
+                                        {alert.status === 'resolved' && (
+                                             <Eye size={18} className="text-industrial-600" />
+                                        )}
                                     </div>
                                 </td>
                             </tr>
