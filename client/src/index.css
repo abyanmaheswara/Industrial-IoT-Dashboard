@@ -47,9 +47,7 @@
 
 @layer components {
   .card {
-    background-color: var(--color-industrial-900);
-    border: 1px solid var(--color-industrial-800);
-    @apply rounded-lg shadow-lg backdrop-blur-sm;
+    @apply bg-white dark:bg-industrial-900 border border-gray-200 dark:border-industrial-800 rounded-lg shadow-sm transition-colors;
   }
   
   .btn {
