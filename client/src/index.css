@@ -47,7 +47,16 @@
 
 @layer components {
   .card {
-    @apply bg-white dark:bg-industrial-900 border border-gray-200 dark:border-industrial-800 rounded-lg shadow-sm transition-colors;
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    transition: background-color 0.2s, border-color 0.2s;
+  }
+  
+  .dark .card {
+    background-color: var(--color-industrial-900);
+    border-color: var(--color-industrial-800);
   }
   
   .btn {
