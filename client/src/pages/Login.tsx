@@ -70,6 +70,7 @@ export const Login: React.FC = () => {
                   className="block w-full pl-10 pr-3 py-2.5 bg-industrial-900 border border-industrial-700 rounded-lg text-white placeholder-industrial-600 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
                   placeholder="Enter username"
                   required
+                  autoComplete="username"
                 />
               </div>
             </div>
@@ -89,6 +90,7 @@ export const Login: React.FC = () => {
                   className="block w-full pl-10 pr-3 py-2.5 bg-industrial-900 border border-industrial-700 rounded-lg text-white placeholder-industrial-600 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
                   placeholder="Enter password"
                   required
+                  autoComplete="current-password"
                 />
               </div>
             </div>
