@@ -79,7 +79,7 @@ export const AlertTable: React.FC<AlertTableProps> = ({ alerts, onRefresh }) => 
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="flex items-center">
-                                            <div className="w-2 h-2 rounded-full mr-2 bg-blue-500"></div>
+                                            <div className="w-2 h-2 rounded-full mr-2 bg-brand-500"></div>
                                             <span className="text-sm font-semibold text-gray-900 dark:text-white">
                                                 {alert.sensor_name || alert.sensor_id}
                                             </span>
@@ -110,7 +110,7 @@ export const AlertTable: React.FC<AlertTableProps> = ({ alerts, onRefresh }) => 
                                                 Active
                                             </span>
                                         ) : alert.status === 'acknowledged' ? (
-                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400 border border-brand-200 dark:border-brand-800">
                                                 <CheckCircle size={12} />
                                                 Acknowledged
                                             </span>
@@ -128,7 +128,7 @@ export const AlertTable: React.FC<AlertTableProps> = ({ alerts, onRefresh }) => 
                                                     {alert.status === 'active' && (
                                                         <button 
                                                             onClick={() => handleAction(alert.id, 'acknowledge')}
-                                                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-400 text-xs font-medium rounded-md transition-all duration-150 border border-blue-200 dark:border-blue-800"
+                                                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-brand-100 dark:bg-brand-900/30 hover:bg-brand-200 dark:hover:bg-brand-900/50 text-brand-700 dark:text-brand-400 text-xs font-medium rounded-md transition-all duration-150 border border-brand-200 dark:border-brand-800"
                                                             title="Acknowledge"
                                                         >
                                                             <CheckCircle size={14} />
@@ -182,7 +182,7 @@ export const AlertTable: React.FC<AlertTableProps> = ({ alerts, onRefresh }) => 
                                     onClick={() => setCurrentPage(pageNum)}
                                     className={`w-8 h-8 rounded-md text-sm font-medium transition-all duration-150 ${
                                         currentPage === pageNum 
-                                            ? 'bg-blue-600 text-white shadow-sm' 
+                                            ? 'bg-gradient-to-r from-brand-brown to-brand-500 text-white shadow-sm' 
                                             : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-300 dark:border-gray-700'
                                     }`}
                                 >

@@ -98,7 +98,7 @@ export const SensorConfig: React.FC = () => {
                 </div>
                 <button 
                     onClick={handleAdd}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-all duration-150 shadow-sm"
+                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-brand-brown to-brand-500 hover:from-brand-brown-dark hover:to-brand-600 text-white text-sm font-medium rounded-lg transition-all duration-150 shadow-sm"
                 >
                     <Plus size={18} />
                     <span>Add Sensor</span>
@@ -122,7 +122,7 @@ export const SensorConfig: React.FC = () => {
                             <tr key={sensor.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-all duration-150">
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="flex items-center gap-2">
-                                        <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                                        <div className="w-2 h-2 rounded-full bg-brand-500"></div>
                                         <span className="text-sm font-mono text-gray-600 dark:text-gray-400">{sensor.id}</span>
                                     </div>
                                 </td>
@@ -168,7 +168,7 @@ export const SensorConfig: React.FC = () => {
                                         </button>
                                         <button 
                                             onClick={() => handleEdit(sensor)}
-                                            className="p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-all duration-150" 
+                                            className="p-2 text-gray-600 dark:text-gray-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-md transition-all duration-150" 
                                             title="Edit"
                                         >
                                             <Edit2 size={16} />
@@ -192,7 +192,7 @@ export const SensorConfig: React.FC = () => {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                     <div className="flex items-center gap-2">
                         <span className="text-sm text-gray-600 dark:text-gray-400">Data Retention:</span>
-                        <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-sm font-semibold rounded border border-blue-200 dark:border-blue-800">30 Days</span>
+                        <span className="px-2 py-1 bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400 text-sm font-semibold rounded border border-brand-200 dark:border-brand-800">30 Days</span>
                     </div>
                     <button className="flex items-center gap-2 px-4 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 text-sm font-medium rounded-lg border border-red-200 dark:border-red-800 transition-all duration-150">
                         <Trash2 size={16} />
@@ -276,7 +276,7 @@ export const SensorConfig: React.FC = () => {
                                 </button>
                                 <button 
                                     type="submit"
-                                    className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded transition-colors"
+                                    className="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded transition-colors"
                                 >
                                     {editingSensor ? 'Update Sensor' : 'Create Sensor'}
                                 </button>

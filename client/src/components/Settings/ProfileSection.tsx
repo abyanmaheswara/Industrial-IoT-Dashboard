@@ -112,7 +112,7 @@ export const ProfileSection: React.FC = () => {
                     <div className="relative group cursor-pointer" onClick={triggerFileInput}>
                         <div className="w-24 h-24 rounded-full bg-gray-200 dark:bg-industrial-800 flex items-center justify-center text-4xl font-bold text-gray-500 dark:text-industrial-500 border-2 border-gray-300 dark:border-industrial-700 overflow-hidden">
                             {isUploading ? (
-                                <Loader className="animate-spin text-blue-500" size={32} />
+                                <Loader className="animate-spin text-brand-500" size={32} />
                             ) : avatar ? (
                                 <img src={avatar} alt="Profile" className="w-full h-full object-cover" />
                             ) : (
@@ -179,7 +179,7 @@ export const ProfileSection: React.FC = () => {
                     </div>
                     
                     <div className="flex justify-end mt-4">
-                        <button className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded transition-colors" onClick={() => alert("Profile updated!")}>
+                        <button className="px-4 py-2 bg-gradient-to-r from-brand-brown to-brand-500 hover:from-brand-brown-dark hover:to-brand-600 text-white text-sm font-medium rounded transition-colors" onClick={() => alert("Profile updated!")}>
                             Save Changes
                         </button>
                     </div>
