@@ -8,29 +8,36 @@ export default {
   theme: {
     extend: {
       colors: {
-        industrial: {
-          50:  'var(--color-industrial-50)',
-          100: 'var(--color-industrial-100)',
-          200: 'var(--color-industrial-200)',
-          300: 'var(--color-industrial-300)',
-          400: 'var(--color-industrial-400)',
-          500: 'var(--color-industrial-500)',
-          600: 'var(--color-industrial-600)',
-          700: 'var(--color-industrial-700)',
-          800: 'var(--color-industrial-800)',
-          900: 'var(--color-industrial-900)',
-          950: 'var(--color-industrial-950)',
+        // BRAND COLORS - Brown Metallic & Orange
+        brand: {
+          50: '#FFF7ED',   // Very light orange
+          100: '#FFEDD5',  // Light orange
+          200: '#FED7AA',  // Lighter orange
+          300: '#FDBA74',  // Light orange
+          400: '#FB923C',  // Medium orange
+          500: '#FF6B35',  // Primary Orange (Industrial Orange)
+          600: '#EA580C',  // Dark orange
+          700: '#C2410C',  // Darker orange
+          800: '#9A3412',  // Very dark orange
+          900: '#7C2D12',  // Almost brown-orange
+          brown: '#8B4513', // Metallic Brown
+          'brown-dark': '#6B3410', // Dark Brown
+          'brown-light': '#A0522D', // Light Brown
         },
-        alert: {
-          success: 'var(--color-alert-success)',
-          warning: 'var(--color-alert-warning)',
-          critical: 'var(--color-alert-critical)',
-        }
+        industrial: {
+          50: '#fafafa',
+          100: '#f4f4f5',
+          200: '#e4e4e7',
+          300: '#d4d4d8',
+          400: '#a1a1aa',
+          500: '#71717a',
+          600: '#52525b',
+          700: '#3f3f46',
+          800: '#27272a',
+          900: '#18181b',
+          950: '#0a0a0b',
+        },
       },
-      fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        mono: ['JetBrains Mono', 'monospace'],
-      }
     },
   },
   plugins: [],
