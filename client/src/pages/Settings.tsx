@@ -1,6 +1,6 @@
 import { useTheme } from '../context/ThemeContext';
 
-function Settings() {
+export function Settings() {
   const { theme, setTheme } = useTheme();
 
   return (
@@ -261,5 +261,3 @@ function Settings() {
     </div>
   );
 }
-
-export default Settings;
