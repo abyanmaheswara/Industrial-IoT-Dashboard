@@ -1,0 +1,20 @@
+<svg width="64" height="64" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="50" cy="50" r="48" fill="url(#metalBrown)" />
+  
+  <!-- Factory Icon -->
+  <path d="M25 65 L25 45 L35 45 L35 40 L45 40 L45 35 L55 35 L55 40 L65 40 L65 45 L75 45 L75 65 Z" fill="#4A2C2A" opacity="0.8"/>
+  
+  <!-- Gear -->
+  <circle cx="50" cy="75" r="8" fill="#FF6B35"/>
+  <circle cx="50" cy="75" r="4" fill="#8B4513"/>
+  
+  <!-- Gradient -->
+  <defs>
+    <linearGradient id="metalBrown" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B4513;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#A0522D;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6B3410;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>

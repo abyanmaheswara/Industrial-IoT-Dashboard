@@ -1,8 +1,21 @@
-# Industrial IoT Dashboard
+<div align="center">
+  <img src="./client/public/favicon.svg" width="120" height="120" alt="FactoryForge Logo">
+  
+  # 🏭 FactoryForge
+  
+  **Industrial IoT Monitoring Platform**
+  
+  Real-time sensor monitoring, analytics, and intelligent alerts for modern manufacturing
+  
+  [![License: MIT](https://img.shields.io/badge/License-MIT-orange.svg)](https://opensource.org/licenses/MIT)
+  [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)](https://reactjs.org/)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+  
+</div>
 
-Real-time Industrial IoT monitoring dashboard with sensor data visualization, analytics, and alert management.
+---
 
-## Features
+## 🔥 Features
 
 ### Phase 2 (Current) ✅
 - **Real-time Monitoring**: Live sensor data streaming via Socket.io
@@ -10,8 +23,15 @@ Real-time Industrial IoT monitoring dashboard with sensor data visualization, an
 - **Interactive Visualizations**: Charts for trends, comparisons, and analysis
 - **Alert Management**: Comprehensive alert history and filtering
 - **Sensor Configuration**: Manage and configure sensors
-- **Dark Theme UI**: Professional industrial control room aesthetics
+- **Modern UI/UX**: Professional design with light/dark theme support
 - **Responsive Design**: Works on desktop and tablet
+
+## 🎨 Color Palette
+
+- **Metallic Brown**: `#8B4513` - Primary brand color
+- **Industrial Orange**: `#FF6B35` - Accent & highlights
+- **Dark Bronze**: `#4A2C2A` - Shadows & depth
+- **Bright Orange**: `#FF8C42` - Interactive elements
 
 ## Tech Stack
 
