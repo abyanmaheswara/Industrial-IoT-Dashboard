@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
 import { ChevronDown, Settings as SettingsIcon } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 
 interface DropdownProps {
     value: string;
@@ -104,7 +105,7 @@ const Dropdown: React.FC<DropdownProps> = ({ value, onChange, options }) => {
 };
 
 export const SystemConfigSection: React.FC = () => {
-    // const { theme, setTheme } = useTheme(); // Removed for Dark Mode Lock
+    const { theme, setTheme } = useTheme();
 
     const [refreshInterval, setRefreshInterval] = useState('10');
     const [tempUnit, setTempUnit] = useState('Celsius');
@@ -138,10 +139,23 @@ export const SystemConfigSection: React.FC = () => {
             </h3>
           </div>
 
-
-
-          {/* Other Settings */}
+          {/* Settings Grid */}
           <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-2 text-industrial-700 dark:text-industrial-300">
+                Interface Theme
+              </label>
+              <Dropdown 
+                value={theme}
+                onChange={(val) => setTheme(val as any)}
+                options={[
+                    { value: "light", label: "Light Mode" },
+                    { value: "dark", label: "Dark Mode" },
+                    { value: "system", label: "System Default" }
+                ]}
+              />
+            </div>
+
             <div>
               <label className="block text-sm font-medium mb-2 text-industrial-700 dark:text-industrial-300">
                 Refresh Interval

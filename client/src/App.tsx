@@ -38,7 +38,6 @@ const DashboardData = () => {
         const customEvent = e as CustomEvent;
         if (customEvent.detail && customEvent.detail.refreshInterval) {
             refreshIntervalRef.current = parseInt(customEvent.detail.refreshInterval) * 1000;
-            console.log('⏱ Refresh interval updated to:', refreshIntervalRef.current, 'ms');
         }
     };
 
@@ -53,11 +52,11 @@ const DashboardData = () => {
     }
 
     const onConnect = () => {
-      console.log('Connected to server');
+      // debug: connected
     };
 
     const onDisconnect = () => {
-      console.log('Disconnected from server');
+      // debug: disconnected
     };
 
     const onSensorData = (data: SensorData[]) => {
