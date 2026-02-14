@@ -64,12 +64,18 @@ const DashboardData = () => {
         if (Array.isArray(initialSensors)) {
             setSensorData(prev => {
                 // Merge with existing, keeping recent data if any
-                return initialSensors.map(s => ({
-                    ...s,
-                    value: s.value || 0,
-                    status: s.status || 'unknown',
-                    timestamp: Date.now()
-                }));
+                return initialSensors.map(s => {
+                    const existing = prev.find(p => p.id === s.id);
+                    if (existing) {
+                        return { ...s, ...existing };
+                    }
+                    return {
+                        ...s,
+                        value: s.value || 0,
+                        status: s.status || 'unknown',
+                        timestamp: Date.now()
+                    };
+                });
             });
         }
     })
