@@ -54,7 +54,7 @@ export const Analytics: React.FC = () => {
           <select 
             value={selectedSensor}
             onChange={(e) => setSelectedSensor(e.target.value)}
-            className="bg-industrial-800 text-industrial-100 border border-industrial-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="bg-industrial-800 text-industrial-100 border border-industrial-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
           >
             <option value="temp_01">Temperature A</option>
             <option value="press_01">Pressure Main</option>
@@ -65,7 +65,7 @@ export const Analytics: React.FC = () => {
           <select 
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value)}
-            className="bg-industrial-800 text-industrial-100 border border-industrial-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="bg-industrial-800 text-industrial-100 border border-industrial-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
           >
             <option value="24h">Last 24 Hours</option>
             <option value="7d">Last 7 Days</option>
@@ -82,7 +82,7 @@ export const Analytics: React.FC = () => {
           unit="%" 
           change={2.4} 
           icon={<Activity size={24} />} 
-          color="text-blue-500"
+          color="bg-brand-500"
         />
         <MetricsCard 
           title="Energy Usage" 
@@ -90,7 +90,7 @@ export const Analytics: React.FC = () => {
           unit="kWh"
           change={-1.2} 
           icon={<Zap size={24} />} 
-          color="text-yellow-500"
+          color="bg-yellow-500"
         />
         <MetricsCard 
           title="Downtime" 
@@ -98,14 +98,14 @@ export const Analytics: React.FC = () => {
           unit="m"
           change={-5} 
           icon={<Clock size={24} />} 
-          color="text-red-500"
+          color="bg-red-500"
         />
         <MetricsCard 
           title="Active Alerts" 
           value="3" 
           change={1} 
           icon={<AlertTriangle size={24} />} 
-          color="text-orange-500"
+          color="bg-orange-500"
         />
       </div>
 
@@ -125,7 +125,7 @@ export const Analytics: React.FC = () => {
                 title="" 
                 data={historyData}
                 dataKeys={[
-                    { key: 'value', color: '#3b82f6', name: 'Value' }
+                    { key: 'value', color: '#FF6B35', name: 'Value' }
                 ]}
             />
         </div>

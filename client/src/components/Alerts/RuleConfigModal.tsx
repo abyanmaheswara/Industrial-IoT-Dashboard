@@ -75,8 +75,8 @@ export const RuleConfigModal: React.FC<RuleConfigModalProps> = ({ isOpen, onClos
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b border-industrial-800 bg-industrial-800/50">
           <div className="flex items-center space-x-3">
-             <div className="p-2 bg-blue-900/30 rounded-lg border border-blue-500/30">
-                <AlertTriangle className="text-blue-400" size={24} />
+             <div className="p-2 bg-brand-900/30 rounded-lg border border-brand-500/30">
+                <AlertTriangle className="text-brand-400" size={24} />
              </div>
              <div>
                 <h2 className="text-xl font-bold text-white">Configure Alert Rules</h2>
@@ -115,7 +115,7 @@ export const RuleConfigModal: React.FC<RuleConfigModalProps> = ({ isOpen, onClos
                     <td className="py-4">
                         <input 
                             type="number" 
-                            className="bg-industrial-950 border border-industrial-700 rounded px-2 py-1 w-24 text-white text-sm focus:border-blue-500 focus:outline-none"
+                            className="bg-industrial-950 border border-industrial-700 rounded px-2 py-1 w-24 text-white text-sm focus:border-brand-500 focus:outline-none"
                             value={sensor.min}
                             onChange={(e) => handleChange(sensor.id, 'min', e.target.value)}
                         />
@@ -123,7 +123,7 @@ export const RuleConfigModal: React.FC<RuleConfigModalProps> = ({ isOpen, onClos
                     <td className="py-4">
                          <input 
                             type="number" 
-                            className="bg-industrial-950 border border-industrial-700 rounded px-2 py-1 w-24 text-white text-sm focus:border-blue-500 focus:outline-none"
+                            className="bg-industrial-950 border border-industrial-700 rounded px-2 py-1 w-24 text-white text-sm focus:border-brand-500 focus:outline-none"
                             value={sensor.max}
                             onChange={(e) => handleChange(sensor.id, 'max', e.target.value)}
                         />
@@ -139,7 +139,7 @@ export const RuleConfigModal: React.FC<RuleConfigModalProps> = ({ isOpen, onClos
                     <td className="py-4 text-right">
                         <button 
                             onClick={() => handleSave(sensor)}
-                            className="text-blue-400 hover:text-blue-300 p-2 hover:bg-blue-900/20 rounded-full transition-colors"
+                            className="text-brand-400 hover:text-brand-300 p-2 hover:bg-brand-900/20 rounded-full transition-colors"
                             title="Save Changes"
                         >
                             <Save size={18} />

@@ -3,6 +3,13 @@ import { useTheme } from '../context/ThemeContext';
 export function Settings() {
   const { theme, setTheme } = useTheme();
 
+  const handleThemeChange = (newTheme: 'light' | 'dark' | 'system') => {
+    console.log('🖱️ Button clicked! Changing theme to:', newTheme); // DEBUG
+    setTheme(newTheme);
+  };
+
+  console.log('⚙️ Settings rendered. Current theme:', theme); // DEBUG
+
   return (
     <div className="p-6 min-h-screen bg-gray-50 dark:bg-gray-900">
       <h1 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">
@@ -105,7 +112,8 @@ export function Settings() {
             <div className="grid grid-cols-3 gap-4">
               {/* Light Theme Button */}
               <button
-                onClick={() => setTheme('light')}
+                onClick={() => handleThemeChange('light')}
+                type="button"
                 className={`p-4 rounded-lg border-2 transition-all ${
                   theme === 'light'
                     ? 'border-brand-500 bg-gradient-to-br from-brand-100 to-brand-200 shadow-md'
@@ -124,7 +132,8 @@ export function Settings() {
 
               {/* Dark Theme Button */}
               <button
-                onClick={() => setTheme('dark')}
+                onClick={() => handleThemeChange('dark')}
+                type="button"
                 className={`p-4 rounded-lg border-2 transition-all ${
                   theme === 'dark'
                     ? 'border-brand-500 bg-gradient-to-br from-brand-900 to-brand-800 shadow-md'
@@ -143,7 +152,8 @@ export function Settings() {
 
               {/* System Theme Button */}
               <button
-                onClick={() => setTheme('system')}
+                onClick={() => handleThemeChange('system')}
+                type="button"
                 className={`p-4 rounded-lg border-2 transition-all ${
                   theme === 'system'
                     ? 'border-brand-500 bg-gradient-to-br from-brand-100 to-brand-200 dark:from-brand-900 dark:to-brand-800 shadow-md'

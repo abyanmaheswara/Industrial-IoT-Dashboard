@@ -10,7 +10,7 @@ interface MetricsCardProps {
   color?: string;
 }
 
-export const MetricsCard: React.FC<MetricsCardProps> = ({ title, value, unit, change, icon, color = 'bg-blue-500' }) => {
+export const MetricsCard: React.FC<MetricsCardProps> = ({ title, value, unit, change, icon, color = 'bg-brand-500' }) => {
   const isPositive = change && change > 0;
   
   return (

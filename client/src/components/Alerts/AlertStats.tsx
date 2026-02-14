@@ -36,9 +36,9 @@ export const AlertStats: React.FC<AlertStatsProps> = ({ stats }) => {
              <div className="card p-4 flex items-center justify-between">
                 <div>
                    <p className="text-industrial-400 text-xs uppercase font-bold">Acknowledged</p>
-                   <p className="text-2xl font-bold text-blue-400">{stats.acknowledged}</p>
+                   <p className="text-2xl font-bold text-green-400">{stats.acknowledged}</p>
                 </div>
-                 <div className="p-3 bg-blue-500/20 rounded-full text-blue-400">
+                 <div className="p-3 bg-green-500/20 rounded-full text-green-400">
                     <CheckCircle size={24} />
                 </div>
             </div>

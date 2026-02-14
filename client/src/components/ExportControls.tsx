@@ -58,7 +58,7 @@ export const ExportControls: React.FC<ExportControlsProps> = ({ sensorId }) => {
             <button 
                 onClick={() => handleDownload('pdf')}
                 disabled={!!loading}
-                className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white rounded text-sm transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-brand-brown to-brand-500 hover:from-brand-brown-dark hover:to-brand-600 text-white rounded text-sm transition-all shadow-sm hover:shadow disabled:opacity-50"
             >
                 {loading === 'pdf' ? <Loader className="animate-spin" size={16} /> : <FileText size={16} />}
                 Download Report (PDF)

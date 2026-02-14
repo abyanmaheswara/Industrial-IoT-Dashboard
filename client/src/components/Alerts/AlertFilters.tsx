@@ -27,7 +27,7 @@ export const AlertFilters: React.FC<AlertFiltersProps> = ({
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search alerts by sensor name or ID..." 
-                    className="w-full pl-10 pr-4 py-2 bg-white dark:bg-industrial-950 border border-gray-300 dark:border-industrial-800 rounded-md text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 placeholder-gray-400 dark:placeholder-industrial-600"
+                    className="w-full pl-10 pr-4 py-2 bg-white dark:bg-industrial-950 border border-gray-300 dark:border-industrial-800 rounded-md text-gray-900 dark:text-white focus:outline-none focus:border-brand-500 placeholder-gray-400 dark:placeholder-industrial-600"
                 />
             </div>
             

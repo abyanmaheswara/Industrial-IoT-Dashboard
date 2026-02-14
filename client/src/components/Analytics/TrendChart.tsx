@@ -14,7 +14,7 @@ export const TrendChart: React.FC<TrendChartProps> = ({ data, title, dataKeys })
         <h3 className="text-lg font-medium text-white">{title}</h3>
         {/* Placeholder for controls */}
         <div className="flex space-x-2">
-            <select className="bg-industrial-800 border border-industrial-700 text-xs text-white rounded px-2 py-1 focus:outline-none focus:border-blue-500">
+            <select className="bg-industrial-800 border border-industrial-700 text-xs text-white rounded px-2 py-1 focus:outline-none focus:border-brand-500">
                 <option>Last 24 Hours</option>
                 <option>Last 7 Days</option>
                 <option>Last 30 Days</option>

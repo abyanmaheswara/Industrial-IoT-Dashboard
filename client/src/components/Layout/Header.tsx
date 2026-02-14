@@ -243,7 +243,7 @@ export function Header() {
                 <div className="p-3 border-t border-gray-200 dark:border-gray-700">
                   <button 
                     onClick={handleViewAllAlerts}
-                    className="w-full text-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
+                    className="w-full text-center text-sm text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium"
                   >
                     View all alerts
                   </button>
