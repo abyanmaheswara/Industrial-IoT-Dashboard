@@ -10,6 +10,23 @@ export const Analytics: React.FC = () => {
   const [historyData, setHistoryData] = useState<any[]>([]);
 
   // Fetch history data when sensor or range changes
+  const [unitSystem, setUnitSystem] = useState('Celsius');
+
+  useEffect(() => {
+    const saved = localStorage.getItem('settings_temp_unit');
+    if (saved) setUnitSystem(saved);
+
+    const handleSettingsChange = (e: Event) => {
+        const customEvent = e as CustomEvent;
+        if (customEvent.detail && customEvent.detail.tempUnit) {
+            setUnitSystem(customEvent.detail.tempUnit);
+        }
+    };
+
+    window.addEventListener('settingsChanged', handleSettingsChange);
+    return () => window.removeEventListener('settingsChanged', handleSettingsChange);
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -20,10 +37,17 @@ export const Analytics: React.FC = () => {
         
         // Transform for chart
         // Recharts expects array of objects
-        const charted = data.map((d: any) => ({
-          time: new Date(d.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          value: parseFloat(d.value)
-        }));
+        const charted = data.map((d: any) => {
+           let val = parseFloat(d.value);
+           // Convert if Temperature sensor AND unit is Fahrenheit
+           if (selectedSensor === 'temp_01' && unitSystem === 'Fahrenheit') {
+               val = Number((val * 9/5 + 32).toFixed(1));
+           }
+           return {
+              time: new Date(d.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              value: val
+           };
+        });
         
         setHistoryData(charted);
       } catch (error) {
@@ -36,20 +60,20 @@ export const Analytics: React.FC = () => {
     // Refresh every 5 seconds
     const interval = setInterval(fetchData, 5000);
     return () => clearInterval(interval);
-  }, [selectedSensor, dateRange]);
+  }, [selectedSensor, dateRange, unitSystem]);
 
   return (
     <div className="p-6 space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-industrial-50">System Analytics</h1>
-          <p className="text-slate-400 text-sm mt-1">Real-time database history</p>
+          <p className="text-industrial-400 text-sm mt-1">Real-time database history</p>
         </div>
         
         <div className="mt-4 md:mt-0 flex flex-wrap gap-4 items-center">
           <ExportControls sensorId={selectedSensor} />
           
-          <div className="h-8 w-px bg-slate-700 hidden md:block"></div>
+          <div className="h-8 w-px bg-industrial-700 hidden md:block"></div>
 
           <select 
             value={selectedSensor}

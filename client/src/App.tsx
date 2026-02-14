@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Outlet, useOutletContext } from 'react-router-dom';
 import { socket } from './socket';
 import type { SensorData } from './types/sensor';
@@ -22,6 +22,29 @@ import { Register } from './pages/Register';
 const DashboardData = () => {
   const [sensorData, setSensorData] = useState<SensorData[]>([]);
   const [powerHistory, setPowerHistory] = useState<SensorData[]>([]);
+  
+  // Throttling refs
+  const lastUpdateRef = useRef<number>(0);
+  const refreshIntervalRef = useRef<number>(2000); // Default 2s matching server
+
+  useEffect(() => {
+    // Load initial setting
+    const saved = localStorage.getItem('settings_refresh_interval');
+    if (saved) {
+        refreshIntervalRef.current = parseInt(saved) * 1000;
+    }
+
+    const handleSettingsChange = (e: Event) => {
+        const customEvent = e as CustomEvent;
+        if (customEvent.detail && customEvent.detail.refreshInterval) {
+            refreshIntervalRef.current = parseInt(customEvent.detail.refreshInterval) * 1000;
+            console.log('⏱ Refresh interval updated to:', refreshIntervalRef.current, 'ms');
+        }
+    };
+
+    window.addEventListener('settingsChanged', handleSettingsChange);
+    return () => window.removeEventListener('settingsChanged', handleSettingsChange);
+  }, []);
 
   useEffect(() => {
     // Connect socket
@@ -38,15 +61,20 @@ const DashboardData = () => {
     };
 
     const onSensorData = (data: SensorData[]) => {
-      setSensorData(data);
-      
-      const powerSensor = data.find(s => s.id === 'pwr_01');
-      if (powerSensor) {
-        setPowerHistory(prev => {
-          const newHistory = [...prev, powerSensor];
-          if (newHistory.length > 50) return newHistory.slice(newHistory.length - 50);
-          return newHistory;
-        });
+      const now = Date.now();
+      // Only update if enough time has passed
+      if (now - lastUpdateRef.current >= refreshIntervalRef.current) {
+          setSensorData(data);
+          lastUpdateRef.current = now;
+          
+          const powerSensor = data.find(s => s.id === 'pwr_01');
+          if (powerSensor) {
+            setPowerHistory(prev => {
+              const newHistory = [...prev, powerSensor];
+              if (newHistory.length > 50) return newHistory.slice(newHistory.length - 50);
+              return newHistory;
+            });
+          }
       }
     };
 
@@ -79,12 +107,9 @@ const Overview_Wrapper = () => {
     return <Overview sensorData={sensorData} powerHistory={powerHistory} />;
 }
 
-import { ThemeProvider } from './context/ThemeContext';
-
 function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
+    <AuthProvider>
       <Router>
         <Routes>
           {/* Public Routes */}
@@ -103,7 +128,6 @@ function App() {
         </Routes>
       </Router>
     </AuthProvider>
-    </ThemeProvider>
   );
 }
 

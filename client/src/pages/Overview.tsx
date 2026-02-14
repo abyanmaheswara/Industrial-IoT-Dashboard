@@ -33,13 +33,13 @@ export const Overview: React.FC<OverviewProps> = ({ sensorData, powerHistory }) 
 
       {/* Main Charts Area */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+        <div className="lg:col-span-2 bg-industrial-50 dark:bg-industrial-800 rounded-lg p-6 border border-industrial-200 dark:border-industrial-700">
+          <h2 className="text-xl font-bold mb-4 text-industrial-900 dark:text-white">
             Power Trend (kW)
           </h2>
           {powerHistory.length > 0 ? (
               <div className="w-full h-[300px]">
-                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={200}>
                   <LineChart data={powerHistory}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                     <XAxis 
@@ -83,19 +83,19 @@ export const Overview: React.FC<OverviewProps> = ({ sensorData, powerHistory }) 
                 </ResponsiveContainer>
               </div>
           ) : (
-            <div className="h-[300px] flex items-center justify-center text-gray-500 dark:text-gray-400">
+            <div className="h-[300px] flex items-center justify-center text-industrial-500 dark:text-industrial-400">
               Waiting for data history...
             </div>
           )}
         </div>
         
         {/* Recent Alerts Panel */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700 lg:col-span-1">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Recent Alerts</h3>
+        <div className="bg-industrial-50 dark:bg-industrial-800 rounded-lg p-6 border border-industrial-200 dark:border-industrial-700 lg:col-span-1">
+          <h3 className="text-lg font-medium text-industrial-900 dark:text-white mb-4">Recent Alerts</h3>
             <div className="space-y-3">
               {sensorData.filter(s => s.status !== 'normal').length === 0 ? (
-                <div className="text-gray-400 text-sm flex flex-col items-center justify-center h-40">
-                  <span className="text-gray-500 mb-2">No active alerts</span>
+                <div className="text-industrial-400 text-sm flex flex-col items-center justify-center h-40">
+                  <span className="text-industrial-500 mb-2">No active alerts</span>
                   <span className="text-xs">System operating normally</span>
                 </div>
               ) : (
@@ -104,8 +104,8 @@ export const Overview: React.FC<OverviewProps> = ({ sensorData, powerHistory }) 
                     sensor.status === 'critical' ? 'bg-red-50 dark:bg-red-900/20 border-red-500' : 'bg-yellow-50 dark:bg-amber-900/20 border-amber-500'
                   }`}>
                     <div className="flex justify-between items-start">
-                      <span className="font-medium text-gray-900 dark:text-gray-100 text-sm">{sensor.name}</span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">{new Date(sensor.timestamp).toLocaleTimeString()}</span>
+                      <span className="font-medium text-industrial-900 dark:text-industrial-100 text-sm">{sensor.name}</span>
+                      <span className="text-xs text-industrial-500 dark:text-industrial-400">{new Date(sensor.timestamp).toLocaleTimeString()}</span>
                     </div>
                     <div className="mt-1 text-sm">
                       <span className={sensor.status === 'critical' ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400'}>

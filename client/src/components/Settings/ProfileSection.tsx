@@ -105,12 +105,15 @@ export const ProfileSection: React.FC = () => {
 
     return (
         <div className="card p-6 mb-6">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4 border-b border-gray-200 dark:border-industrial-800 pb-2">User Profile</h3>
+            <div className="flex items-center gap-3 mb-6 pb-2 border-b border-industrial-200 dark:border-industrial-700">
+                <User className="text-brand-600 dark:text-brand-400" size={20} />
+                <h3 className="text-lg font-medium text-industrial-100 dark:text-industrial-50">User Profile</h3>
+            </div>
             
             <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
                 <div className="flex flex-col items-center gap-2">
                     <div className="relative group cursor-pointer" onClick={triggerFileInput}>
-                        <div className="w-24 h-24 rounded-full bg-gray-200 dark:bg-industrial-800 flex items-center justify-center text-4xl font-bold text-gray-500 dark:text-industrial-500 border-2 border-gray-300 dark:border-industrial-700 overflow-hidden">
+                        <div className="w-24 h-24 rounded-full bg-industrial-200 dark:bg-industrial-800 flex items-center justify-center text-4xl font-bold text-industrial-500 dark:text-industrial-500 border-2 border-industrial-300 dark:border-industrial-700 overflow-hidden">
                             {isUploading ? (
                                 <Loader className="animate-spin text-brand-500" size={32} />
                             ) : avatar ? (
@@ -142,7 +145,7 @@ export const ProfileSection: React.FC = () => {
                             Remove Photo
                         </button>
                     )}
-                    <p className="text-xs text-gray-500 dark:text-industrial-500 text-center">
+                    <p className="text-xs text-industrial-500 dark:text-industrial-500 text-center">
                         Max 2MB • JPG, PNG
                     </p>
                 </div>
@@ -150,29 +153,29 @@ export const ProfileSection: React.FC = () => {
                 <div className="flex-1 space-y-4 w-full">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-medium text-gray-600 dark:text-industrial-400 mb-1">Username</label>
-                            <div className="flex items-center bg-gray-50 dark:bg-industrial-900 border border-gray-200 dark:border-industrial-800 rounded px-3 py-2 text-gray-900 dark:text-white">
-                                <User size={16} className="mr-2 text-gray-500 dark:text-industrial-500" />
+                            <label className="block text-xs font-medium text-industrial-600 dark:text-industrial-400 mb-1">Username</label>
+                            <div className="flex items-center bg-industrial-50 dark:bg-industrial-900 border border-industrial-200 dark:border-industrial-800 rounded px-3 py-2 text-industrial-900 dark:text-white">
+                                <User size={16} className="mr-2 text-industrial-500 dark:text-industrial-500" />
                                 <span>{user?.username || 'Guest'}</span>
                             </div>
                         </div>
                          <div>
-                            <label className="block text-xs font-medium text-gray-600 dark:text-industrial-400 mb-1">User ID</label>
-                            <div className="flex items-center bg-gray-50 dark:bg-industrial-900 border border-gray-200 dark:border-industrial-800 rounded px-3 py-2 text-gray-900 dark:text-white">
-                                <Mail size={16} className="mr-2 text-gray-500 dark:text-industrial-500" />
+                            <label className="block text-xs font-medium text-industrial-600 dark:text-industrial-400 mb-1">User ID</label>
+                            <div className="flex items-center bg-industrial-50 dark:bg-industrial-900 border border-industrial-200 dark:border-industrial-800 rounded px-3 py-2 text-industrial-900 dark:text-white">
+                                <Mail size={16} className="mr-2 text-industrial-500 dark:text-industrial-500" />
                                 <span>{user?.id ? `USER-${user.id}` : 'N/A'}</span>
                             </div>
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-gray-600 dark:text-industrial-400 mb-1">Role</label>
-                            <div className="flex items-center bg-gray-50 dark:bg-industrial-900 border border-gray-200 dark:border-industrial-800 rounded px-3 py-2 text-gray-900 dark:text-white">
-                                <Shield size={16} className="mr-2 text-gray-500 dark:text-industrial-500" />
+                            <label className="block text-xs font-medium text-industrial-600 dark:text-industrial-400 mb-1">Role</label>
+                            <div className="flex items-center bg-industrial-50 dark:bg-industrial-900 border border-industrial-200 dark:border-industrial-800 rounded px-3 py-2 text-industrial-900 dark:text-white">
+                                <Shield size={16} className="mr-2 text-industrial-500 dark:text-industrial-500" />
                                 <span className="capitalize">{user?.role || 'Viewer'}</span>
                             </div>
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-gray-600 dark:text-industrial-400 mb-1">Department</label>
-                            <div className="bg-gray-50 dark:bg-industrial-900 border border-gray-200 dark:border-industrial-800 rounded px-3 py-2 text-gray-900 dark:text-white">
+                            <label className="block text-xs font-medium text-industrial-600 dark:text-industrial-400 mb-1">Department</label>
+                            <div className="bg-industrial-50 dark:bg-industrial-900 border border-industrial-200 dark:border-industrial-800 rounded px-3 py-2 text-industrial-900 dark:text-white">
                                 <span>General Operations</span>
                             </div>
                         </div>

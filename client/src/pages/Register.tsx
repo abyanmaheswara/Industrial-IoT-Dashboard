@@ -44,16 +44,16 @@ export const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-industrial-900 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-industrial-800 rounded-xl shadow-2xl border border-industrial-700 overflow-hidden">
+    <div className="min-h-screen bg-industrial-950 flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-industrial-800 rounded-xl shadow-xl border border-industrial-200 dark:border-industrial-700 overflow-hidden">
         <div className="p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-white mb-2">NEW OPERATOR</h1>
+            <h1 className="text-3xl font-bold text-industrial-50 mb-2">NEW OPERATOR</h1>
             <p className="text-industrial-400">Register for system access</p>
           </div>
 
           {error && (
-            <div className="mb-6 bg-red-900/50 border border-red-500/50 text-red-200 px-4 py-3 rounded-lg flex items-center gap-2">
+            <div className="mb-6 bg-red-50 dark:bg-red-900/50 border border-red-200 dark:border-red-500/50 text-red-600 dark:text-red-200 px-4 py-3 rounded-lg flex items-center gap-2">
               <AlertTriangle size={18} />
               <span className="text-sm">{error}</span>
             </div>
@@ -61,7 +61,7 @@ export const Register: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-industrial-300 mb-2">
+              <label className="block text-sm font-medium text-industrial-600 dark:text-industrial-300 mb-2">
                 Username
               </label>
               <div className="relative">
@@ -72,7 +72,7 @@ export const Register: React.FC = () => {
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 bg-industrial-900 border border-industrial-700 rounded-lg text-white placeholder-industrial-600 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
+                  className="block w-full pl-10 pr-3 py-2.5 bg-industrial-50 dark:bg-industrial-900 border border-industrial-200 dark:border-industrial-700 rounded-lg text-industrial-900 dark:text-white placeholder-industrial-400 dark:placeholder-industrial-600 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
                   placeholder="Choose username"
                   required
                   autoComplete="username"
@@ -81,7 +81,7 @@ export const Register: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-industrial-300 mb-2">
+              <label className="block text-sm font-medium text-industrial-600 dark:text-industrial-300 mb-2">
                 Password
               </label>
               <div className="relative">
@@ -92,7 +92,7 @@ export const Register: React.FC = () => {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 bg-industrial-900 border border-industrial-700 rounded-lg text-white placeholder-industrial-600 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
+                  className="block w-full pl-10 pr-3 py-2.5 bg-industrial-50 dark:bg-industrial-900 border border-industrial-200 dark:border-industrial-700 rounded-lg text-industrial-900 dark:text-white placeholder-industrial-400 dark:placeholder-industrial-600 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
                   placeholder="Create password"
                   required
                   autoComplete="new-password"
@@ -101,7 +101,7 @@ export const Register: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-industrial-300 mb-2">
+              <label className="block text-sm font-medium text-industrial-600 dark:text-industrial-300 mb-2">
                 Confirm Password
               </label>
               <div className="relative">
@@ -112,7 +112,7 @@ export const Register: React.FC = () => {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 bg-industrial-900 border border-industrial-700 rounded-lg text-white placeholder-industrial-600 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
+                  className="block w-full pl-10 pr-3 py-2.5 bg-industrial-50 dark:bg-industrial-900 border border-industrial-200 dark:border-industrial-700 rounded-lg text-industrial-900 dark:text-white placeholder-industrial-400 dark:placeholder-industrial-600 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
                   placeholder="Repeat password"
                   required
                   autoComplete="new-password"
@@ -121,13 +121,13 @@ export const Register: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-industrial-300 mb-2">
+              <label className="block text-sm font-medium text-industrial-600 dark:text-industrial-300 mb-2">
                 Role Request
               </label>
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="block w-full px-3 py-2.5 bg-industrial-900 border border-industrial-700 rounded-lg text-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
+                className="block w-full px-3 py-2.5 bg-industrial-50 dark:bg-industrial-900 border border-industrial-200 dark:border-industrial-700 rounded-lg text-industrial-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
               >
                 <option value="viewer">Viewer (Read Only)</option>
                 <option value="operator">Operator (Manage Alerts)</option>
@@ -146,9 +146,9 @@ export const Register: React.FC = () => {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-industrial-400">
+            <p className="text-sm text-industrial-500 dark:text-industrial-400">
               Already have access?{' '}
-              <Link to="/login" className="font-medium text-brand-400 hover:text-brand-300">
+              <Link to="/login" className="font-medium text-brand-600 dark:text-brand-400 hover:text-brand-500 dark:hover:text-brand-300">
                 Sign in
               </Link>
             </p>

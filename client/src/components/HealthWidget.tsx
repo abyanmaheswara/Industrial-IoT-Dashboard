@@ -22,9 +22,9 @@ export const HealthWidget: React.FC<HealthWidgetProps> = ({ sensors, aiEnabled }
     };
 
     return (
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 transition-colors">
+        <div className="bg-industrial-50 dark:bg-industrial-800 p-6 rounded-lg shadow-lg border border-industrial-200 dark:border-industrial-700 transition-colors">
             <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                <h3 className="text-xl font-bold text-industrial-900 dark:text-gray-100 flex items-center gap-2">
                     <Brain className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                     AI System Insights
                 </h3>
@@ -37,19 +37,19 @@ export const HealthWidget: React.FC<HealthWidgetProps> = ({ sensors, aiEnabled }
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Health Score */}
-                <div className="flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg transition-colors">
-                    <span className="text-gray-600 dark:text-gray-400 text-sm mb-2">Overall Machine Health</span>
+                <div className="flex flex-col items-center justify-center p-4 bg-industrial-100 dark:bg-industrial-900/50 rounded-lg transition-colors">
+                    <span className="text-industrial-600 dark:text-industrial-400 text-sm mb-2">Overall Machine Health</span>
                     <div className={`text-5xl font-bold ${getHealthColor(avgHealth)}`}>
                         {avgHealth}%
                     </div>
-                    <div className="mt-2 text-xs text-center text-gray-500 dark:text-gray-500">
+                    <div className="mt-2 text-xs text-center text-industrial-500 dark:text-industrial-500">
                         Based on utilization & alerts
                     </div>
                 </div>
 
                 {/* Anomaly Monitor */}
                 <div className="flex flex-col gap-3">
-                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Detected Anomalies (Real-time)</div>
+                    <div className="text-sm text-industrial-600 dark:text-industrial-400 mb-1">Detected Anomalies (Real-time)</div>
                     
                     {anomalies.length === 0 ? (
                         <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded text-green-700 dark:text-green-400 text-sm transition-colors">

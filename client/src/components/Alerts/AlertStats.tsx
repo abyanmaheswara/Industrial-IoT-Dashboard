@@ -46,7 +46,7 @@ export const AlertStats: React.FC<AlertStatsProps> = ({ stats }) => {
              <div className="card p-4 flex items-center justify-between">
                  <div>
                    <p className="text-industrial-400 text-xs uppercase font-bold">Avg Response</p>
-                   <p className="text-2xl font-bold text-white">{stats.avgResponse}</p>
+                   <p className="text-2xl font-bold text-industrial-900 dark:text-white">{stats.avgResponse}</p>
                 </div>
                 <div className="p-3 bg-industrial-700/50 rounded-full text-industrial-400">
                     <Clock size={24} />

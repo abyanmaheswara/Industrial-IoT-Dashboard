@@ -48,39 +48,39 @@ export const AlertTable: React.FC<AlertTableProps> = ({ alerts, onRefresh }) => 
             <div className="overflow-x-auto">
                 <table className="w-full">
                     <thead>
-                        <tr className="border-b-2 border-gray-200 dark:border-gray-700">
-                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Time</th>
-                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Sensor</th>
-                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Severity</th>
-                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Message</th>
-                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                            <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                        <tr className="border-b-2 border-industrial-200 dark:border-industrial-700">
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-industrial-600 dark:text-industrial-400 uppercase tracking-wider">Time</th>
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-industrial-600 dark:text-industrial-400 uppercase tracking-wider">Sensor</th>
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-industrial-600 dark:text-industrial-400 uppercase tracking-wider">Severity</th>
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-industrial-600 dark:text-industrial-400 uppercase tracking-wider">Message</th>
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-industrial-600 dark:text-industrial-400 uppercase tracking-wider">Status</th>
+                            <th className="px-6 py-4 text-right text-xs font-semibold text-industrial-600 dark:text-industrial-400 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                    <tbody className="divide-y divide-industrial-100 dark:divide-industrial-800">
                         {currentAlerts.length === 0 ? (
                             <tr>
                                 <td colSpan={6} className="px-6 py-12 text-center">
-                                    <AlertCircle className="w-12 h-12 mx-auto mb-3 text-gray-400 dark:text-gray-600" />
-                                    <p className="text-gray-500 dark:text-gray-400 font-medium">No alerts found</p>
-                                    <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">All systems operating normally</p>
+                                    <AlertCircle className="w-12 h-12 mx-auto mb-3 text-industrial-400 dark:text-industrial-600" />
+                                    <p className="text-industrial-500 dark:text-industrial-400 font-medium">No alerts found</p>
+                                    <p className="text-sm text-industrial-400 dark:text-industrial-500 mt-1">All systems operating normally</p>
                                 </td>
                             </tr>
                         ) : (
                             currentAlerts.map((alert) => (
-                                <tr key={alert.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-all duration-150">
+                                <tr key={alert.id} className="hover:bg-industrial-50 dark:hover:bg-industrial-800/40 transition-all duration-150">
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                                        <div className="text-sm font-medium text-industrial-900 dark:text-white">
                                             {new Date(alert.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                                         </div>
-                                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                                        <div className="text-xs text-industrial-500 dark:text-industrial-400">
                                             {new Date(alert.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="flex items-center">
                                             <div className="w-2 h-2 rounded-full mr-2 bg-brand-500"></div>
-                                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                                            <span className="text-sm font-semibold text-industrial-900 dark:text-white">
                                                 {alert.sensor_name || alert.sensor_id}
                                             </span>
                                         </div>
@@ -99,7 +99,7 @@ export const AlertTable: React.FC<AlertTableProps> = ({ alerts, onRefresh }) => 
                                         )}
                                     </td>
                                     <td className="px-6 py-4">
-                                        <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2">
+                                        <p className="text-sm text-industrial-700 dark:text-industrial-300 line-clamp-2">
                                             {alert.message}
                                         </p>
                                     </td>
@@ -146,7 +146,7 @@ export const AlertTable: React.FC<AlertTableProps> = ({ alerts, onRefresh }) => 
                                                 </>
                                             )}
                                             {alert.status === 'resolved' && (
-                                                <span className="inline-flex items-center gap-1 px-3 py-1.5 text-gray-400 dark:text-gray-600 text-xs">
+                                                <span className="inline-flex items-center gap-1 px-3 py-1.5 text-industrial-400 dark:text-industrial-600 text-xs">
                                                     <Eye size={14} />
                                                     Closed
                                                 </span>
@@ -159,17 +159,17 @@ export const AlertTable: React.FC<AlertTableProps> = ({ alerts, onRefresh }) => 
                     </tbody>
                 </table>
             </div>
-            <div className="bg-gray-50 dark:bg-gray-900/50 px-6 py-4 border-t border-gray-200 dark:border-gray-800 flex items-center justify-between">
+            <div className="bg-industrial-50 dark:bg-industrial-900/50 px-6 py-4 border-t border-industrial-200 dark:border-industrial-800 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                        Showing <span className="font-semibold text-gray-900 dark:text-white">{startIndex + 1}</span> to <span className="font-semibold text-gray-900 dark:text-white">{Math.min(endIndex, alerts.length)}</span> of <span className="font-semibold text-gray-900 dark:text-white">{alerts.length}</span> alerts
+                    <span className="text-sm text-industrial-600 dark:text-industrial-400">
+                        Showing <span className="font-semibold text-industrial-900 dark:text-white">{startIndex + 1}</span> to <span className="font-semibold text-industrial-900 dark:text-white">{Math.min(endIndex, alerts.length)}</span> of <span className="font-semibold text-industrial-900 dark:text-white">{alerts.length}</span> alerts
                     </span>
                 </div>
                 <div className="flex items-center gap-1">
                     <button 
                         onClick={handlePrevPage}
                         disabled={currentPage === 1}
-                        className="px-3 py-1.5 border border-gray-300 dark:border-gray-700 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-150"
+                        className="px-3 py-1.5 border border-industrial-300 dark:border-industrial-700 rounded-md text-sm font-medium text-industrial-700 dark:text-industrial-300 hover:bg-industrial-100 dark:hover:bg-industrial-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-150"
                     >
                         Previous
                     </button>
@@ -183,7 +183,7 @@ export const AlertTable: React.FC<AlertTableProps> = ({ alerts, onRefresh }) => 
                                     className={`w-8 h-8 rounded-md text-sm font-medium transition-all duration-150 ${
                                         currentPage === pageNum 
                                             ? 'bg-gradient-to-r from-brand-brown to-brand-500 text-white shadow-sm' 
-                                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-300 dark:border-gray-700'
+                                            : 'text-industrial-700 dark:text-industrial-300 hover:bg-industrial-100 dark:hover:bg-industrial-800 border border-industrial-300 dark:border-industrial-700'
                                     }`}
                                 >
                                     {pageNum}
@@ -194,7 +194,7 @@ export const AlertTable: React.FC<AlertTableProps> = ({ alerts, onRefresh }) => 
                     <button 
                         onClick={handleNextPage}
                         disabled={currentPage === totalPages || totalPages === 0}
-                        className="px-3 py-1.5 border border-gray-300 dark:border-gray-700 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-150"
+                        className="px-3 py-1.5 border border-industrial-300 dark:border-industrial-700 rounded-md text-sm font-medium text-industrial-700 dark:text-industrial-300 hover:bg-industrial-100 dark:hover:bg-industrial-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-150"
                     >
                         Next
                     </button>

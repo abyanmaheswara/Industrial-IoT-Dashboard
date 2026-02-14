@@ -70,20 +70,20 @@ export const RuleConfigModal: React.FC<RuleConfigModalProps> = ({ isOpen, onClos
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-industrial-900 border border-industrial-700 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-industrial-50 dark:bg-industrial-900 border border-industrial-200 dark:border-industrial-700 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
         
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-industrial-800 bg-industrial-800/50">
+        <div className="flex justify-between items-center p-6 border-b border-industrial-200 dark:border-industrial-800 bg-industrial-100/50 dark:bg-industrial-800/50">
           <div className="flex items-center space-x-3">
-             <div className="p-2 bg-brand-900/30 rounded-lg border border-brand-500/30">
-                <AlertTriangle className="text-brand-400" size={24} />
+             <div className="p-2 bg-brand-100 dark:bg-brand-900/30 rounded-lg border border-brand-200 dark:border-brand-500/30">
+                <AlertTriangle className="text-brand-600 dark:text-brand-400" size={24} />
              </div>
              <div>
-                <h2 className="text-xl font-bold text-white">Configure Alert Rules</h2>
-                <p className="text-sm text-industrial-400">Define operational thresholds for sensors</p>
+                <h2 className="text-xl font-bold text-industrial-900 dark:text-white">Configure Alert Rules</h2>
+                <p className="text-sm text-industrial-500 dark:text-industrial-400">Define operational thresholds for sensors</p>
              </div>
           </div>
-          <button onClick={onClose} className="text-industrial-400 hover:text-white transition-colors">
+          <button onClick={onClose} className="text-industrial-400 hover:text-industrial-900 dark:hover:text-white transition-colors">
             <X size={24} />
           </button>
         </div>
@@ -97,25 +97,25 @@ export const RuleConfigModal: React.FC<RuleConfigModalProps> = ({ isOpen, onClos
           ) : (
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="text-industrial-400 text-sm border-b border-industrial-800">
+                <tr className="text-industrial-500 dark:text-industrial-400 text-sm border-b border-industrial-200 dark:border-industrial-800">
                   <th className="py-3 font-medium">Sensor Name</th>
                   <th className="py-3 font-medium">Min Value</th>
                   <th className="py-3 font-medium">Max Value</th>
-                  <th className="py-3 font-medium text-yellow-500">Threshold (Critical)</th>
+                  <th className="py-3 font-medium text-yellow-600 dark:text-yellow-500">Threshold (Critical)</th>
                   <th className="py-3 font-medium text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-industrial-800">
+              <tbody className="divide-y divide-industrial-200 dark:divide-industrial-800">
                 {sensors.map(sensor => (
-                  <tr key={sensor.id} className="group hover:bg-industrial-800/30 transition-colors">
-                    <td className="py-4 text-white font-medium">
+                  <tr key={sensor.id} className="group hover:bg-industrial-100 dark:hover:bg-industrial-800/30 transition-colors">
+                    <td className="py-4 text-industrial-900 dark:text-white font-medium">
                         {sensor.name}
                         <div className="text-xs text-industrial-500 font-normal">{sensor.id}</div>
                     </td>
                     <td className="py-4">
                         <input 
                             type="number" 
-                            className="bg-industrial-950 border border-industrial-700 rounded px-2 py-1 w-24 text-white text-sm focus:border-brand-500 focus:outline-none"
+                            className="bg-industrial-200 dark:bg-industrial-950 border border-industrial-300 dark:border-industrial-700 rounded px-2 py-1 w-24 text-industrial-900 dark:text-white text-sm focus:border-brand-500 focus:outline-none"
                             value={sensor.min}
                             onChange={(e) => handleChange(sensor.id, 'min', e.target.value)}
                         />
@@ -123,7 +123,7 @@ export const RuleConfigModal: React.FC<RuleConfigModalProps> = ({ isOpen, onClos
                     <td className="py-4">
                          <input 
                             type="number" 
-                            className="bg-industrial-950 border border-industrial-700 rounded px-2 py-1 w-24 text-white text-sm focus:border-brand-500 focus:outline-none"
+                            className="bg-industrial-200 dark:bg-industrial-950 border border-industrial-300 dark:border-industrial-700 rounded px-2 py-1 w-24 text-industrial-900 dark:text-white text-sm focus:border-brand-500 focus:outline-none"
                             value={sensor.max}
                             onChange={(e) => handleChange(sensor.id, 'max', e.target.value)}
                         />
@@ -131,7 +131,7 @@ export const RuleConfigModal: React.FC<RuleConfigModalProps> = ({ isOpen, onClos
                     <td className="py-4">
                          <input 
                             type="number" 
-                            className="bg-industrial-950 border border-industrial-700 rounded px-2 py-1 w-24 text-yellow-500 font-bold text-sm focus:border-yellow-500 focus:outline-none"
+                            className="bg-industrial-200 dark:bg-industrial-950 border border-industrial-300 dark:border-industrial-700 rounded px-2 py-1 w-24 text-yellow-600 dark:text-yellow-500 font-bold text-sm focus:border-yellow-500 focus:outline-none"
                             value={sensor.threshold}
                             onChange={(e) => handleChange(sensor.id, 'threshold', e.target.value)}
                         />
@@ -139,7 +139,7 @@ export const RuleConfigModal: React.FC<RuleConfigModalProps> = ({ isOpen, onClos
                     <td className="py-4 text-right">
                         <button 
                             onClick={() => handleSave(sensor)}
-                            className="text-brand-400 hover:text-brand-300 p-2 hover:bg-brand-900/20 rounded-full transition-colors"
+                            className="text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 p-2 hover:bg-brand-100 dark:hover:bg-brand-900/20 rounded-full transition-colors"
                             title="Save Changes"
                         >
                             <Save size={18} />
@@ -153,10 +153,10 @@ export const RuleConfigModal: React.FC<RuleConfigModalProps> = ({ isOpen, onClos
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-industrial-800 bg-industrial-900 flex justify-end">
+        <div className="p-4 border-t border-industrial-200 dark:border-industrial-800 bg-industrial-100 dark:bg-industrial-900 flex justify-end">
             <button 
                 onClick={onClose}
-                className="px-4 py-2 bg-industrial-800 text-white rounded hover:bg-industrial-700 transition"
+                className="px-4 py-2 bg-industrial-200 dark:bg-industrial-800 text-industrial-900 dark:text-white rounded hover:bg-industrial-300 dark:hover:bg-industrial-700 transition"
             >
                 Done
             </button>

@@ -8,34 +8,32 @@ export default {
   theme: {
     extend: {
       colors: {
-        // BRAND COLORS - Brown Metallic & Orange
+        // BRAND COLORS - Copper/Bronze Metallic
         brand: {
-          50: '#FFF7ED',   // Very light orange
-          100: '#FFEDD5',  // Light orange
-          200: '#FED7AA',  // Lighter orange
-          300: '#FDBA74',  // Light orange
-          400: '#FB923C',  // Medium orange
-          500: '#FF6B35',  // Primary Orange (Industrial Orange)
-          600: '#EA580C',  // Dark orange
-          700: '#C2410C',  // Darker orange
-          800: '#9A3412',  // Very dark orange
-          900: '#7C2D12',  // Almost brown-orange
-          brown: '#8B4513', // Metallic Brown
-          'brown-dark': '#6B3410', // Dark Brown
-          'brown-light': '#A0522D', // Light Brown
+          50: '#fdf8f6',
+          100: '#f6e8df',
+          200: '#ead0c0',
+          300: '#dab096',
+          400: '#c58765',
+          500: '#b45309', // Rich Copper/Bronze
+          600: '#92400e', // Dark Copper
+          700: '#78350f', // Deep Bronze
+          800: '#451a03', // Coffee
+          900: '#2a1002', // Dark Chocolate
         },
+        // INDUSTRIAL COLORS - True Black & Charcoal
         industrial: {
-          50: '#fafafa',
-          100: '#f4f4f5',
-          200: '#e4e4e7',
-          300: '#d4d4d8',
-          400: '#a1a1aa',
-          500: '#71717a',
-          600: '#52525b',
-          700: '#3f3f46',
-          800: '#27272a',
-          900: '#18181b',
-          950: '#0a0a0b',
+          50: '#fafafa',   // Pure White-ish
+          100: '#f4f4f5',  // Zinc 100
+          200: '#e4e4e7',  // Zinc 200
+          300: '#d4d4d8',  // Zinc 300
+          400: '#a1a1aa',  // Zinc 400
+          500: '#71717a',  // Zinc 500 (Text Secondary)
+          600: '#52525b',  // Zinc 600
+          700: '#3f3f46',  // Zinc 700 (Borders)
+          800: '#27272a',  // Zinc 800 (Card Bg)
+          900: '#18181b',  // Zinc 900 (Sidebar Bg)
+          950: '#000000',  // Pure Black (Main Bg)
         },
       },
     },

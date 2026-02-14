@@ -27,10 +27,10 @@ export const MetricsCard: React.FC<MetricsCardProps> = ({ title, value, unit, ch
           )}
         </div>
         
-        <h3 className="text-gray-600 dark:text-industrial-400 text-sm font-medium uppercase tracking-wide">{title}</h3>
+        <h3 className="text-industrial-600 dark:text-industrial-400 text-sm font-medium uppercase tracking-wide">{title}</h3>
         <div className="flex items-baseline mt-1">
-          <span className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{value}</span>
-          {unit && <span className="ml-1 text-gray-500 dark:text-industrial-500 text-sm font-medium">{unit}</span>}
+          <span className="text-2xl font-bold text-industrial-900 dark:text-white tracking-tight">{value}</span>
+          {unit && <span className="ml-1 text-industrial-500 dark:text-industrial-500 text-sm font-medium">{unit}</span>}
         </div>
       </div>
       

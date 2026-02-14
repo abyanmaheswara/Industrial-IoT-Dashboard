@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import type { SensorData } from '../types/sensor';
 import { Activity, Thermometer, Zap, Gauge } from 'lucide-react';
 
@@ -32,11 +33,40 @@ const getStatusBg = (status: string) => {
 };
 
 export const SensorWidget = ({ data }: SensorWidgetProps) => {
+  const [unitSystem, setUnitSystem] = useState('Celsius');
+
+  useEffect(() => {
+    // Load initial setting
+    const saved = localStorage.getItem('settings_temp_unit');
+    if (saved) setUnitSystem(saved);
+
+    // Listen for changes
+    const handleSettingsChange = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail && customEvent.detail.tempUnit) {
+        setUnitSystem(customEvent.detail.tempUnit);
+      }
+    };
+
+    window.addEventListener('settingsChanged', handleSettingsChange);
+    return () => window.removeEventListener('settingsChanged', handleSettingsChange);
+  }, []);
+
   const statusColor = getStatusColor(data.status);
   const statusBg = getStatusBg(data.status);
   
   // Anomaly styling
   const anomalyClass = data.isAnomaly ? 'ring-2 ring-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.5)]' : '';
+
+  // Unit Conversion Logic
+  let displayValue = data.value;
+  let displayUnit = data.unit;
+
+  if (data.type === 'temperature' && unitSystem === 'Fahrenheit') {
+     // Assuming data.value is in Celsius
+     displayValue = Number((data.value * 9/5 + 32).toFixed(1));
+     displayUnit = '°F';
+  }
 
   return (
     <div className={`card p-6 relative overflow-hidden transition-all duration-300 ${data.status === 'critical' ? 'animate-pulse border-alert-critical' : ''} ${anomalyClass}`}>
@@ -55,10 +85,10 @@ export const SensorWidget = ({ data }: SensorWidgetProps) => {
       </div>
       
       <div>
-        <h3 className="text-gray-600 dark:text-industrial-400 text-sm font-medium mb-1">{data.name}</h3>
+        <h3 className="text-industrial-600 dark:text-industrial-400 text-sm font-medium mb-1">{data.name}</h3>
         <div className="flex items-baseline">
-          <span className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">{data.value}</span>
-          <span className="ml-1 text-gray-500 dark:text-industrial-500 font-medium">{data.unit}</span>
+          <span className="text-3xl font-bold text-industrial-900 dark:text-white tracking-tight">{displayValue}</span>
+          <span className="ml-1 text-industrial-500 dark:text-industrial-500 font-medium">{displayUnit}</span>
         </div>
         {data.health !== undefined && (
             <div className="mt-2 w-full bg-gray-700 h-1.5 rounded-full overflow-hidden">
