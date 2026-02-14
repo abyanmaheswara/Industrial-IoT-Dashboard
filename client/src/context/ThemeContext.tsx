@@ -16,41 +16,49 @@ const ThemeContext = createContext<ThemeContextType>({
 });
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('dark');
+  const [theme, setTheme] = useState<Theme>(() => {
+    // Load from localStorage on initial mount
+    const saved = localStorage.getItem('factoryforge-theme') as Theme | null;
+    return saved || 'dark';
+  });
+  
   const [effectiveTheme, setEffectiveTheme] = useState<EffectiveTheme>('dark');
 
-  // Load theme from localStorage on mount
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as Theme | null;
-    if (savedTheme) {
-      setTheme(savedTheme);
-    }
-  }, []);
-
-  // Apply theme whenever it changes
-  useEffect(() => {
-    localStorage.setItem('theme', theme);
+    // Save to localStorage whenever theme changes
+    localStorage.setItem('factoryforge-theme', theme);
 
     if (theme === 'system') {
-      // Detect system preference
-      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setEffectiveTheme(isDark ? 'dark' : 'light');
-      document.documentElement.classList.toggle('dark', isDark);
-
-      // Listen for system theme changes
+      // Use system preference
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      const handleChange = (e: MediaQueryListEvent) => {
-        const newIsDark = e.matches;
-        setEffectiveTheme(newIsDark ? 'dark' : 'light');
-        document.documentElement.classList.toggle('dark', newIsDark);
+      const updateTheme = (e: MediaQueryListEvent | MediaQueryList) => {
+        const isDark = e.matches;
+        setEffectiveTheme(isDark ? 'dark' : 'light');
+        
+        // Apply to document
+        if (isDark) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
       };
 
-      mediaQuery.addEventListener('change', handleChange);
-      return () => mediaQuery.removeEventListener('change', handleChange);
+      // Initial check
+      updateTheme(mediaQuery);
+
+      // Listen for changes
+      mediaQuery.addEventListener('change', updateTheme);
+      return () => mediaQuery.removeEventListener('change', updateTheme);
     } else {
-      // Manual theme selection
-      setEffectiveTheme(theme as EffectiveTheme);
-      document.documentElement.classList.toggle('dark', theme === 'dark');
+      // Use manual selection
+      setEffectiveTheme(theme);
+      
+      // Apply to document
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
     }
   }, [theme]);
 
