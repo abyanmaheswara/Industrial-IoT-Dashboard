@@ -39,7 +39,7 @@ export const Overview: React.FC<OverviewProps> = ({ sensorData, powerHistory }) 
           </h2>
           {powerHistory.length > 0 ? (
               <div className="w-full h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                   <LineChart data={powerHistory}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                     <XAxis 

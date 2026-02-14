@@ -58,7 +58,12 @@ const DashboardData = () => {
       socket.off('connect', onConnect);
       socket.off('disconnect', onDisconnect);
       socket.off('sensorData', onSensorData);
-      socket.disconnect();
+      
+      // Only disconnect if connected to avoid "WebSocket closed before connection established" error
+      // in React Strict Mode (which mounts/unmounts rapidly)
+      if (socket.connected) {
+        socket.disconnect();
+      }
     };
   }, []);
 

@@ -72,7 +72,7 @@ export const Register: React.FC = () => {
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 bg-industrial-900 border border-industrial-700 rounded-lg text-white placeholder-industrial-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="block w-full pl-10 pr-3 py-2.5 bg-industrial-900 border border-industrial-700 rounded-lg text-white placeholder-industrial-600 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
                   placeholder="Choose username"
                   required
                 />
@@ -91,7 +91,7 @@ export const Register: React.FC = () => {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 bg-industrial-900 border border-industrial-700 rounded-lg text-white placeholder-industrial-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="block w-full pl-10 pr-3 py-2.5 bg-industrial-900 border border-industrial-700 rounded-lg text-white placeholder-industrial-600 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
                   placeholder="Create password"
                   required
                 />
@@ -110,7 +110,7 @@ export const Register: React.FC = () => {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 bg-industrial-900 border border-industrial-700 rounded-lg text-white placeholder-industrial-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="block w-full pl-10 pr-3 py-2.5 bg-industrial-900 border border-industrial-700 rounded-lg text-white placeholder-industrial-600 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
                   placeholder="Repeat password"
                   required
                 />
@@ -124,7 +124,7 @@ export const Register: React.FC = () => {
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="block w-full px-3 py-2.5 bg-industrial-900 border border-industrial-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="block w-full px-3 py-2.5 bg-industrial-900 border border-industrial-700 rounded-lg text-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
               >
                 <option value="viewer">Viewer (Read Only)</option>
                 <option value="operator">Operator (Manage Alerts)</option>
@@ -136,7 +136,7 @@ export const Register: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-brand-brown to-brand-500 hover:from-brand-brown-dark hover:to-brand-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {loading ? 'Registering...' : 'REQUEST ACCESS'}
             </button>
@@ -145,7 +145,7 @@ export const Register: React.FC = () => {
           <div className="mt-6 text-center">
             <p className="text-sm text-industrial-400">
               Already have access?{' '}
-              <Link to="/login" className="font-medium text-blue-400 hover:text-blue-300">
+              <Link to="/login" className="font-medium text-brand-400 hover:text-brand-300">
                 Sign in
               </Link>
             </p>

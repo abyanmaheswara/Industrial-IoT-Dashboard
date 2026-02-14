@@ -67,7 +67,7 @@ export const Login: React.FC = () => {
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 bg-industrial-900 border border-industrial-700 rounded-lg text-white placeholder-industrial-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="block w-full pl-10 pr-3 py-2.5 bg-industrial-900 border border-industrial-700 rounded-lg text-white placeholder-industrial-600 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
                   placeholder="Enter username"
                   required
                 />
@@ -86,7 +86,7 @@ export const Login: React.FC = () => {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 bg-industrial-900 border border-industrial-700 rounded-lg text-white placeholder-industrial-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="block w-full pl-10 pr-3 py-2.5 bg-industrial-900 border border-industrial-700 rounded-lg text-white placeholder-industrial-600 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
                   placeholder="Enter password"
                   required
                 />
@@ -96,7 +96,7 @@ export const Login: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-brand-brown to-brand-500 hover:from-brand-brown-dark hover:to-brand-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               {loading ? 'Authenticating...' : 'INITIATE SESSION'}
             </button>
@@ -105,7 +105,7 @@ export const Login: React.FC = () => {
           <div className="mt-6 text-center">
             <p className="text-sm text-industrial-400">
               New personnel?{' '}
-              <Link to="/register" className="font-medium text-blue-400 hover:text-blue-300">
+              <Link to="/register" className="font-medium text-brand-400 hover:text-brand-300">
                 Register access
               </Link>
             </p>
