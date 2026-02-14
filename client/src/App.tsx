@@ -51,6 +51,30 @@ const DashboardData = () => {
       socket.connect();
     }
 
+    // Fetch initial sensor list to ensure UI knows about all sensors (even if no data yet)
+    // Actually, dashboard relies on 'sensorData' event which sends the whole array.
+    // The backend's setInterval loop (simulated) OR mqtt event (real) sends data.
+    // For purely new sensors that haven't sent data yet, they won't appear until first data packet.
+    // To fix this, we could fetch /api/sensors and initialize state with empty values.
+    fetch('http://localhost:3001/api/sensors', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    })
+    .then(res => res.json())
+    .then(initialSensors => {
+        if (Array.isArray(initialSensors)) {
+            setSensorData(prev => {
+                // Merge with existing, keeping recent data if any
+                return initialSensors.map(s => ({
+                    ...s,
+                    value: s.value || 0,
+                    status: s.status || 'unknown',
+                    timestamp: Date.now()
+                }));
+            });
+        }
+    })
+    .catch(err => console.error("Failed to load initial sensors", err));
+
     const onConnect = () => {
       // debug: connected
     };

@@ -45,7 +45,7 @@ const setupDatabase = async () => {
     
     // Execute schema
     await dbClient.query(schemaSql);
-    console.log('Tables created successfully!');
+    console.log('Tables ensured successfully!');
     
     await dbClient.end();
   } catch (err) {

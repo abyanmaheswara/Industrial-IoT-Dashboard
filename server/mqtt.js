@@ -1,11 +1,13 @@
-const aedes = require('aedes')();
+const Aedes = require('aedes').Aedes;
+const aedes = new Aedes();
 const server = require('net').createServer(aedes.handle);
 const db = require('./db');
 
-const startBroker = (io) => {
+const startBroker = (io, onDataReceived) => {
     const PORT = 1883;
+    const HOST = '0.0.0.0'; // Explicitly bind to all IPv4 interfaces
 
-    server.listen(PORT, function () {
+    server.listen(PORT, HOST, function () {
         console.log(`📡 MQTT Broker started on port ${PORT}`);
     });
 
@@ -28,17 +30,23 @@ const startBroker = (io) => {
                 
                 // Expecting payload: { id: "temp_01", value: 25.5 }
                 if(data.id && data.value !== undefined) {
-                    console.log(`[MQTT] Data received from ${data.id}: ${data.value}`);
+                    const val = parseFloat(data.value);
+                    console.log(`[MQTT] Data received from ${data.id}: ${val}`);
                     
                     // 1. Save to Database
-                    await db.saveReading(data.id, parseFloat(data.value));
+                    await db.saveReading(data.id, val);
 
                     // 2. Emit to Socket.io (Real-time Dashboard)
                     io.emit('sensorUpdate', {
                         id: data.id,
-                        value: parseFloat(data.value),
+                        value: val,
                         timestamp: new Date()
                     });
+
+                    // 3. Trigger Alert/AI Logic (Callback)
+                    if (onDataReceived) {
+                        onDataReceived(data.id, val);
+                    }
                 }
             } catch (err) {
                 console.error(`[MQTT] Error processing message on ${packet.topic}:`, err.message);

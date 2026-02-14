@@ -37,11 +37,17 @@ const io = new Server(server, {
 });
 
 // Sensor Configurations
+// Sensor Configurations
 const SENSORS = [
-  { id: 'temp_01', name: 'Temperature A', type: 'temperature', unit: '°C', min: 20, max: 80, threshold: 50, baseline: 45 },
-  { id: 'press_01', name: 'Pressure Main', type: 'pressure', unit: 'bar', min: 1, max: 10, threshold: 8, baseline: 5 },
-  { id: 'vib_01', name: 'Vibration Motor', type: 'vibration', unit: 'mm/s', min: 0, max: 15, threshold: 12, baseline: 2 },
-  { id: 'pwr_01', name: 'Power Consumption', type: 'power', unit: 'kW', min: 10, max: 100, threshold: 90, baseline: 45 }
+  // Simulated Sensors (Disabled for Production)
+  // { id: 'temp_01', name: 'Temperature A', type: 'temperature', unit: '°C', min: 20, max: 80, threshold: 50, baseline: 45 },
+  // { id: 'press_01', name: 'Pressure Main', type: 'pressure', unit: 'bar', min: 1, max: 10, threshold: 8, baseline: 5 },
+  // { id: 'vib_01', name: 'Vibration Motor', type: 'vibration', unit: 'mm/s', min: 0, max: 15, threshold: 12, baseline: 2 },
+  // { id: 'pwr_01', name: 'Power Consumption', type: 'power', unit: 'kW', min: 10, max: 100, threshold: 90, baseline: 45 },
+  
+  // Hardware Sensors (ESP32)
+  { id: 'dht_temp', name: 'ESP32 Temp', type: 'temperature', unit: '°C', min: 0, max: 50, threshold: 40, baseline: 25 },
+  { id: 'dht_humid', name: 'ESP32 Humidity', type: 'humidity', unit: '%', min: 0, max: 100, threshold: 80, baseline: 50 }
 ];
 
 // Initialize sensors in DB
@@ -50,13 +56,7 @@ SENSORS.forEach(sensor => {
 });
 
 const ai = require('./ai'); // Import AI module
-
-// ... (existing code)
-
-// Initialize sensors in DB
-SENSORS.forEach(sensor => {
-    db.ensureSensor(sensor).catch(err => console.error('Error ensuring sensor:', err.message));
-});
+const mqtt = require('./mqtt'); // Import MQTT module
 
 // Simulation State
 const sensorState = {};
@@ -71,6 +71,60 @@ SENSORS.forEach(sensor => {
   };
   sensorHistory[sensor.id] = [];
   healthState[sensor.id] = 100; // Start at 100% health
+});
+
+// --- REUSABLE ALERT & AI LOGIC ---
+const processSensorData = (sensorId, value) => {
+    const sensor = SENSORS.find(s => s.id === sensorId);
+    if (!sensor) return;
+
+    const status = getStatus(value, sensor);
+    
+    // --- AI Logic Start ---
+    
+    // 1. Update History Buffer (Keep last 20 points)
+    if (!sensorHistory[sensor.id]) sensorHistory[sensor.id] = [];
+    sensorHistory[sensor.id].push(value);
+    if (sensorHistory[sensor.id].length > 20) sensorHistory[sensor.id].shift();
+
+    // 2. Detect Anomaly
+    const { isAnomaly, zScore } = ai.detectAnomaly(value, sensorHistory[sensor.id]);
+
+    // 3. Update Health Score
+    if (healthState[sensor.id] === undefined) healthState[sensor.id] = 100;
+    healthState[sensor.id] = ai.updateHealthScore(healthState[sensor.id], value, sensor.threshold);
+    
+    // --- AI Logic End ---
+
+    // Check for alerts
+    if (status === 'critical' || status === 'warning') {
+        const type = status;
+        const message = `${sensor.name} value ${value} ${sensor.unit} is ${status.toUpperCase()}`;
+        
+        db.createAlert(sensor.id, type, message).then(newAlert => {
+           if (newAlert) {
+               io.emit('newAlert', newAlert);
+               console.log(`[ALERT] New ${type} alert for ${sensor.id}: ${message}`);
+           }
+        });
+    } else if (status === 'normal') {
+        // Auto-resolve any active alerts
+        db.autoResolveAlerts(sensor.id).then(resolvedAlerts => {
+            if (resolvedAlerts && resolvedAlerts.length > 0) {
+                console.log(`[ALERT] Auto-resolved ${resolvedAlerts.length} alert(s) for ${sensor.id} (Status Normal)`);
+                resolvedAlerts.forEach(alert => {
+                    io.emit('alertUpdated', alert);
+                });
+            }
+        });
+    }
+    
+    return { status, isAnomaly, zScore, health: healthState[sensor.id] };
+};
+
+// Initialize MQTT Broker with Alert Logic Callback
+mqtt.startBroker(io, (id, value) => {
+    processSensorData(id, value);
 });
 
 function generateValue(sensor) {
@@ -118,58 +172,27 @@ io.on('connection', (socket) => {
 // Data Emission Loop (2 seconds)
 setInterval(() => {
   const timestamp = Date.now();
-  const data = SENSORS.map(sensor => {
+  const data = [];
+
+  SENSORS.forEach(sensor => {
+    // SKIP Hardware Sensors (Let MQTT handle them)
+    if (sensor.id === 'dht_temp' || sensor.id === 'dht_humid') return;
+      
     const value = generateValue(sensor);
-    const status = getStatus(value, sensor);
+    const processed = processSensorData(sensor.id, value); // Run Alert Logic
     
-    // --- AI Logic Start ---
-    
-    // 1. Update History Buffer (Keep last 20 points)
-    if (!sensorHistory[sensor.id]) sensorHistory[sensor.id] = [];
-    sensorHistory[sensor.id].push(value);
-    if (sensorHistory[sensor.id].length > 20) sensorHistory[sensor.id].shift();
+    // Safety check if processed returns undefined (e.g. sensor not found)
+    if (!processed) return;
 
-    // 2. Detect Anomaly
-    const { isAnomaly, zScore } = ai.detectAnomaly(value, sensorHistory[sensor.id]);
-
-    // 3. Update Health Score
-    healthState[sensor.id] = ai.updateHealthScore(healthState[sensor.id], value, sensor.threshold);
-    
-    // --- AI Logic End ---
-
-    // Check for alerts
-    if (status === 'critical' || status === 'warning') {
-        const type = status;
-        const message = `${sensor.name} value ${value} ${sensor.unit} is ${status.toUpperCase()}`;
-        
-        // Only emit if we actually create a new alert (this logic is slightly duplicated with DB check, 
-        // but for UI responsiveness we can emit. Ideally DB should return if it created one)
-        // For now, let's trust the DB check or just emit. 
-        // Better: refactor createAlert to return the created alert object if new.
-        
-        db.createAlert(sensor.id, type, message).then(newAlert => {
-           if (newAlert) {
-               io.emit('newAlert', newAlert);
-           }
-        });
-    } else if (status === 'normal') {
-        // Auto-resolve any active alerts if sensor is back to normal
-        db.autoResolveAlerts(sensor.id).then(resolvedAlerts => {
-            if (resolvedAlerts && resolvedAlerts.length > 0) {
-                // Optional: Emit event to validte UI that alert is resolved?
-                // For now, next fetch loop will show it resolved.
-                // Or we can emit an 'alertUpdated' event.
-                resolvedAlerts.forEach(alert => {
-                    io.emit('alertUpdated', alert);
-                });
-            }
-        });
-    }
+    const status = processed.status;
+    const isAnomaly = processed.isAnomaly;
+    const zScore = processed.zScore;
+    const health = processed.health;
 
     // Save to Database
     db.saveReading(sensor.id, value, status);
 
-    return {
+    data.push({
       id: sensor.id,
       name: sensor.name,
       type: sensor.type,
@@ -177,20 +200,114 @@ setInterval(() => {
       unit: sensor.unit,
       timestamp: timestamp,
       status: status,
-      // Add AI fields
       isAnomaly: isAnomaly,
-      zScore: zScore.toFixed(2),
-      health: parseFloat(healthState[sensor.id].toFixed(1))
-    };
+      zScore: typeof zScore === 'number' ? zScore.toFixed(2) : zScore,
+      health: parseFloat(health.toFixed(1))
+    });
   });
 
-  io.emit('sensorData', data);
-  // console.log('Emitted data:', data.length, 'sensors');
+  // Only emit if we have simulated data (otherwise dashboard relies on MQTT events or we should emit mixed? 
+  // Frontend likely expects full array. But MQTT emits 'sensorUpdate'.
+  // Ideally we should emit everything. But since hardware sensors are async updates, 
+  // we can just emit the simulated ones here.)
+  if (data.length > 0) {
+      io.emit('sensorData', data);
+  }
 }, 2000);
 
 // API Endpoints
 app.get('/api/sensors', (req, res) => {
     res.json(SENSORS);
+});
+
+app.post('/api/sensors', async (req, res) => {
+    try {
+        const { id, name, type, unit, threshold } = req.body;
+        if (!id || !name) return res.status(400).json({ error: "ID and Name required" });
+
+        // Check if exists
+        if (SENSORS.find(s => s.id === id)) {
+            return res.status(400).json({ error: "Sensor ID already exists" });
+        }
+
+        const newSensor = {
+            id, 
+            name, 
+            type: type || 'generic', 
+            unit: unit || '', 
+            min: 0, 
+            max: 100, 
+            threshold: parseFloat(threshold) || 80, 
+            baseline: 50,
+            status: 'active'
+        };
+
+        // Add to memory for simulation
+        SENSORS.push(newSensor);
+        
+        // Initialize state
+        sensorState[id] = { value: newSensor.baseline, trend: 0 };
+        sensorHistory[id] = [];
+        healthState[id] = 100;
+
+        // Persist to DB
+        await db.ensureSensor(newSensor);
+
+        res.status(201).json(newSensor);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.put('/api/sensors/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, threshold, unit, status } = req.body;
+        
+        const sensor = SENSORS.find(s => s.id === id);
+        if (!sensor) return res.status(404).json({ error: "Sensor not found" });
+
+        if (name) sensor.name = name;
+        if (threshold) sensor.threshold = parseFloat(threshold);
+        if (unit) sensor.unit = unit;
+        if (status) sensor.status = status;
+
+        // Update DB
+        // Using direct query here as db.ensureSensor is for creation.
+        // Ideally we should add updateSensor to db module, but for now exact query works.
+        await db.query('UPDATE sensors SET name=$1, unit=$2, threshold=$3, status=$4 WHERE id=$5', 
+            [sensor.name, sensor.unit, sensor.threshold, sensor.status, id]);
+
+        res.json({ success: true, sensor });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.delete('/api/sensors/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const index = SENSORS.findIndex(s => s.id === id);
+        
+        if (index !== -1) {
+            SENSORS.splice(index, 1); // Remove from simulation
+            
+            // Clean up states
+            delete sensorState[id];
+            delete sensorHistory[id];
+            delete healthState[id];
+
+            // Remove from DB (Optional: Soft delete? User asked to remove, so hard delete)
+            await db.query('DELETE FROM sensors WHERE id = $1', [id]);
+            
+            res.json({ success: true });
+        } else {
+            res.status(404).json({ error: "Sensor not found" });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.post('/api/sensors', async (req, res) => {

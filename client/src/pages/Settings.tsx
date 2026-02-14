@@ -1,6 +1,7 @@
 import { ProfileSection } from '../components/Settings/ProfileSection';
 import { SystemConfigSection } from '../components/Settings/SystemConfigSection';
 import { NotificationsSection } from '../components/Settings/NotificationsSection';
+import SensorManager from '../components/SensorManager';
 
 export function Settings() {
   return (
@@ -12,6 +13,11 @@ export function Settings() {
 
       {/* User Profile */}
       <ProfileSection />
+      
+      {/* Sensor Management */}
+      <div className="mb-6">
+        <SensorManager />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* System Configuration */}
