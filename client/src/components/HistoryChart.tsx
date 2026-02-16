@@ -12,8 +12,8 @@ export const HistoryChart = ({ data, color = "#10b981" }: HistoryChartProps) => 
   
   if (!data || data.length === 0) {
     return (
-      <div className="h-full w-full flex items-center justify-center text-gray-500 dark:text-industrial-500">
-        <p>Waiting for data history...</p>
+      <div className="h-full w-full flex items-center justify-center text-brand-700/50">
+        <p className="text-[11px] font-bold uppercase tracking-widest">Waiting for data history...</p>
       </div>
     );
   }
@@ -30,22 +30,22 @@ export const HistoryChart = ({ data, color = "#10b981" }: HistoryChartProps) => 
             bottom: 5,
           }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#2a343c" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#473c31" vertical={false} opacity={0.3} />
           <XAxis 
             dataKey="timestamp" 
             tickFormatter={(timestamp: number) => new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-            stroke="#688397"
-            tick={{ fontSize: 12 }}
+            stroke="#826f5a"
+            tick={{ fontSize: 10, fill: '#826f5a', fontWeight: 'bold' }}
             minTickGap={30}
           />
           <YAxis 
-            stroke="#688397" 
-            tick={{ fontSize: 12 }}
+            stroke="#826f5a" 
+            tick={{ fontSize: 10, fill: '#826f5a', fontWeight: 'bold' }}
             domain={['auto', 'auto']}
           />
           <Tooltip 
-            contentStyle={{ backgroundColor: '#151a1e', borderColor: '#2a343c', color: '#f4f6f8' }}
-            labelStyle={{ color: '#879cac' }}
+            contentStyle={{ backgroundColor: '#1a1510', borderColor: '#a87932', borderRadius: '8px', border: '1px solid rgba(168, 121, 50, 0.3)', color: '#f2e9d9' }}
+            labelStyle={{ color: '#a87932', fontWeight: 'bold', fontSize: '10px', textTransform: 'uppercase' }}
             labelFormatter={(label: any) => new Date(label).toLocaleTimeString()}
             formatter={(value: any) => [value, '']}
           />

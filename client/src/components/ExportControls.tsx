@@ -13,9 +13,10 @@ export const ExportControls: React.FC<ExportControlsProps> = ({ sensorId }) => {
     const handleDownload = async (type: 'csv' | 'pdf') => {
         setLoading(type);
         try {
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
             const url = type === 'csv' 
-                ? `http://localhost:3001/api/export/csv/${sensorId}`
-                : `http://localhost:3001/api/export/pdf/report`;
+                ? `${API_URL}/api/export/csv/${sensorId}`
+                : `${API_URL}/api/export/pdf/report`;
             
             const response = await fetch(url, {
                 headers: {
@@ -48,9 +49,9 @@ export const ExportControls: React.FC<ExportControlsProps> = ({ sensorId }) => {
                 <button 
                     onClick={() => handleDownload('csv')}
                     disabled={!!loading}
-                    className="flex items-center gap-2 px-3 py-2 bg-gray-700 dark:bg-industrial-700 hover:bg-gray-600 dark:hover:bg-industrial-600 text-gray-100 dark:text-industrial-100 rounded text-sm transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 px-3 py-2 bg-industrial-800 hover:bg-industrial-700 text-industrial-100 rounded-md text-xs font-bold uppercase tracking-wider transition-all border border-industrial-700 disabled:opacity-50"
                 >
-                    {loading === 'csv' ? <Loader className="animate-spin" size={16} /> : <Download size={16} />}
+                    {loading === 'csv' ? <Loader className="animate-spin" size={14} /> : <Download size={14} />}
                     Export Excel
                 </button>
             )}
@@ -58,9 +59,9 @@ export const ExportControls: React.FC<ExportControlsProps> = ({ sensorId }) => {
             <button 
                 onClick={() => handleDownload('pdf')}
                 disabled={!!loading}
-                className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-brand-brown to-brand-500 hover:from-brand-brown-dark hover:to-brand-600 text-white rounded text-sm transition-all shadow-sm hover:shadow disabled:opacity-50"
+                className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-brand-700 to-brand-500 hover:from-brand-600 hover:to-brand-400 text-white rounded-md text-xs font-bold uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(168,121,50,0.2)] disabled:opacity-50 border border-brand-500/20"
             >
-                {loading === 'pdf' ? <Loader className="animate-spin" size={16} /> : <FileText size={16} />}
+                {loading === 'pdf' ? <Loader className="animate-spin" size={14} /> : <FileText size={14} />}
                 Download Report (PDF)
             </button>
         </div>

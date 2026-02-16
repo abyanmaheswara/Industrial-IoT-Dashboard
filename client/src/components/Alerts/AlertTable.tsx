@@ -31,8 +31,9 @@ export const AlertTable: React.FC<AlertTableProps> = ({ alerts, onRefresh }) => 
 
     const handleAction = async (id: number, action: 'acknowledge' | 'resolve') => {
         try {
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
             const status = action === 'acknowledge' ? 'acknowledged' : 'resolved';
-            await fetch(`http://localhost:3001/api/alerts/${id}`, {
+            await fetch(`${API_URL}/api/alerts/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status })
@@ -48,16 +49,16 @@ export const AlertTable: React.FC<AlertTableProps> = ({ alerts, onRefresh }) => 
             <div className="overflow-x-auto">
                 <table className="w-full">
                     <thead>
-                        <tr className="border-b-2 border-industrial-200 dark:border-industrial-700">
-                            <th className="px-6 py-4 text-left text-xs font-semibold text-industrial-600 dark:text-industrial-400 uppercase tracking-wider">Time</th>
-                            <th className="px-6 py-4 text-left text-xs font-semibold text-industrial-600 dark:text-industrial-400 uppercase tracking-wider">Sensor</th>
-                            <th className="px-6 py-4 text-left text-xs font-semibold text-industrial-600 dark:text-industrial-400 uppercase tracking-wider">Severity</th>
-                            <th className="px-6 py-4 text-left text-xs font-semibold text-industrial-600 dark:text-industrial-400 uppercase tracking-wider">Message</th>
-                            <th className="px-6 py-4 text-left text-xs font-semibold text-industrial-600 dark:text-industrial-400 uppercase tracking-wider">Status</th>
-                            <th className="px-6 py-4 text-right text-xs font-semibold text-industrial-600 dark:text-industrial-400 uppercase tracking-wider">Actions</th>
+                        <tr className="border-b border-industrial-700 bg-industrial-900/50">
+                            <th className="px-6 py-4 text-left text-xs font-bold text-industrial-400 uppercase tracking-widest">Time</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-industrial-400 uppercase tracking-widest">Sensor</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-industrial-400 uppercase tracking-widest">Severity</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-industrial-400 uppercase tracking-widest">Message</th>
+                            <th className="px-6 py-4 text-left text-xs font-bold text-industrial-400 uppercase tracking-widest">Status</th>
+                            <th className="px-6 py-4 text-right text-xs font-bold text-industrial-400 uppercase tracking-widest">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-industrial-100 dark:divide-industrial-800">
+                    <tbody className="divide-y divide-industrial-800">
                         {currentAlerts.length === 0 ? (
                             <tr>
                                 <td colSpan={6} className="px-6 py-12 text-center">
@@ -68,31 +69,31 @@ export const AlertTable: React.FC<AlertTableProps> = ({ alerts, onRefresh }) => 
                             </tr>
                         ) : (
                             currentAlerts.map((alert) => (
-                                <tr key={alert.id} className="hover:bg-industrial-50 dark:hover:bg-industrial-800/40 transition-all duration-150">
+                                <tr key={alert.id} className="hover:bg-industrial-800/40 transition-all duration-150 border-b border-industrial-800/50 uppercase">
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="text-sm font-medium text-industrial-900 dark:text-white">
-                                            {new Date(alert.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                        <div className="text-xs font-bold text-white tracking-widest">
+                                            {new Date(alert.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}
                                         </div>
-                                        <div className="text-xs text-industrial-500 dark:text-industrial-400">
+                                        <div className="text-[10px] text-brand-700 font-mono mt-0.5">
                                             {new Date(alert.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="flex items-center">
-                                            <div className="w-2 h-2 rounded-full mr-2 bg-brand-500"></div>
-                                            <span className="text-sm font-semibold text-industrial-900 dark:text-white">
+                                            <div className="w-1.5 h-1.5 rounded-full mr-3 bg-brand-500 shadow-[0_0_8px_rgba(168,121,50,0.5)]"></div>
+                                            <span className="text-xs font-black text-brand-100 tracking-wider">
                                                 {alert.sensor_name || alert.sensor_id}
                                             </span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         {alert.type === 'critical' ? (
-                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-red-500 to-red-600 text-white shadow-sm">
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-red-600 to-red-700 text-white shadow-sm ring-1 ring-red-500/30">
                                                 <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
                                                 CRITICAL
                                             </span>
                                         ) : (
-                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-amber-400 to-amber-500 text-white shadow-sm">
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-brand-600 to-brand-700 text-white shadow-sm ring-1 ring-brand-500/30">
                                                 <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
                                                 WARNING
                                             </span>
@@ -159,10 +160,10 @@ export const AlertTable: React.FC<AlertTableProps> = ({ alerts, onRefresh }) => 
                     </tbody>
                 </table>
             </div>
-            <div className="bg-industrial-50 dark:bg-industrial-900/50 px-6 py-4 border-t border-industrial-200 dark:border-industrial-800 flex items-center justify-between">
+            <div className="bg-industrial-900/40 px-6 py-4 border-t border-industrial-800 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <span className="text-sm text-industrial-600 dark:text-industrial-400">
-                        Showing <span className="font-semibold text-industrial-900 dark:text-white">{startIndex + 1}</span> to <span className="font-semibold text-industrial-900 dark:text-white">{Math.min(endIndex, alerts.length)}</span> of <span className="font-semibold text-industrial-900 dark:text-white">{alerts.length}</span> alerts
+                    <span className="text-[10px] text-industrial-500 uppercase font-bold tracking-widest">
+                        Frame <span className="text-white">{startIndex + 1}</span> - <span className="text-white">{Math.min(endIndex, alerts.length)}</span> of <span className="text-white">{alerts.length}</span> entries
                     </span>
                 </div>
                 <div className="flex items-center gap-1">
@@ -182,8 +183,8 @@ export const AlertTable: React.FC<AlertTableProps> = ({ alerts, onRefresh }) => 
                                     onClick={() => setCurrentPage(pageNum)}
                                     className={`w-8 h-8 rounded-md text-sm font-medium transition-all duration-150 ${
                                         currentPage === pageNum 
-                                            ? 'bg-gradient-to-r from-brand-brown to-brand-500 text-white shadow-sm' 
-                                            : 'text-industrial-700 dark:text-industrial-300 hover:bg-industrial-100 dark:hover:bg-industrial-800 border border-industrial-300 dark:border-industrial-700'
+                                            ? 'bg-gradient-to-r from-brand-700 to-brand-500 text-white shadow-sm ring-1 ring-brand-400/50' 
+                                            : 'text-industrial-300 hover:bg-industrial-800 border border-industrial-700'
                                     }`}
                                 >
                                     {pageNum}

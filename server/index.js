@@ -17,8 +17,13 @@ app.get('/', (req, res) => {
 
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    let token = authHeader && authHeader.split(' ')[1];
     
+    // Support token in query for downloads
+    if (!token && req.query.token) {
+        token = req.query.token;
+    }
+
     if (!token) return res.sendStatus(401);
 
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
@@ -489,11 +494,24 @@ app.get('/api/ai/health', authenticateToken, (req, res) => {
     res.json(response);
 });
 
-// Export Endpoints
+// Report Endpoints
 const exporter = require('./export');
 
+app.get('/api/reports/download/pdf', authenticateToken, (req, res) => {
+    exporter.exportPDFReport(res);
+});
+
+app.get('/api/reports/download/excel', authenticateToken, (req, res) => {
+    exporter.exportToExcel(null, res, 'xlsx');
+});
+
+app.get('/api/reports/download/csv', authenticateToken, (req, res) => {
+    exporter.exportToExcel(null, res, 'csv');
+});
+
+// Legacy Export Endpoints (Redirect to new ones or keep for compatibility)
 app.get('/api/export/csv/:sensorId', authenticateToken, (req, res) => {
-    exporter.exportToExcel(req.params.sensorId, res);
+    exporter.exportToExcel(req.params.sensorId, res, 'xlsx');
 });
 
 app.get('/api/export/pdf/report', authenticateToken, (req, res) => {

@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
 import { ChevronDown, Settings as SettingsIcon } from 'lucide-react';
-import { useTheme } from '../../context/ThemeContext';
 
 interface DropdownProps {
     value: string;
@@ -60,7 +59,7 @@ const Dropdown: React.FC<DropdownProps> = ({ value, onChange, options }) => {
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full px-4 py-2 flex justify-between items-center rounded-lg border bg-industrial-200 dark:bg-industrial-950 border-industrial-300 dark:border-industrial-600 text-industrial-900 dark:text-white focus:outline-none focus:border-brand-500 transition-colors"
+                className="w-full px-4 py-2 flex justify-between items-center rounded-lg border bg-industrial-950 border-industrial-600 text-white focus:outline-none focus:border-brand-500 transition-colors"
                 style={{ minWidth: '0' }} // Allow shrinking if needed
             >
                 <div className="flex items-center gap-2 overflow-hidden">
@@ -71,7 +70,7 @@ const Dropdown: React.FC<DropdownProps> = ({ value, onChange, options }) => {
             
             {isOpen && createPortal(
                 <div 
-                    className="absolute bg-industrial-50 dark:bg-industrial-900 border border-industrial-200 dark:border-industrial-700 rounded-lg shadow-xl z-[99999] overflow-hidden"
+                    className="absolute bg-industrial-900 border border-industrial-700 rounded-lg shadow-xl z-[99999] overflow-hidden"
                     style={{
                         top: coords.top + 4,
                         ...(coords.align === 'left' ? { left: coords.left } : { right: coords.right }),
@@ -90,8 +89,8 @@ const Dropdown: React.FC<DropdownProps> = ({ value, onChange, options }) => {
                             }}
                             className={`px-4 py-2 cursor-pointer whitespace-nowrap transition-colors ${
                                 option.value === value
-                                    ? 'bg-brand-100 dark:bg-brand-900/30 text-brand-900 dark:text-brand-100 font-medium'
-                                    : 'text-industrial-700 dark:text-industrial-300 hover:bg-industrial-200 dark:hover:bg-industrial-800 hover:text-industrial-900 dark:hover:text-white'
+                                    ? 'bg-brand-500/10 text-brand-400 font-bold'
+                                    : 'text-industrial-400 hover:bg-brand-500/5 hover:text-white'
                             }`}
                         >
                             {option.label}
@@ -105,7 +104,6 @@ const Dropdown: React.FC<DropdownProps> = ({ value, onChange, options }) => {
 };
 
 export const SystemConfigSection: React.FC = () => {
-    const { theme, setTheme } = useTheme();
 
     const [refreshInterval, setRefreshInterval] = useState('10');
     const [tempUnit, setTempUnit] = useState('Celsius');
@@ -132,32 +130,16 @@ export const SystemConfigSection: React.FC = () => {
 
     return (
         <div className="card p-6 h-full">
-          <div className="flex items-center gap-3 mb-6 pb-2 border-b border-industrial-200 dark:border-industrial-700">
-            <SettingsIcon className="text-brand-600 dark:text-brand-400" size={20} />
-            <h3 className="text-lg font-medium text-industrial-100 dark:text-industrial-50">
+          <div className="flex items-center gap-3 mb-6 pb-2 border-b border-industrial-800">
+            <SettingsIcon className="text-brand-500" size={20} />
+            <h3 className="text-lg font-bold text-white uppercase tracking-wider">
               System Configuration
             </h3>
           </div>
 
-          {/* Settings Grid */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-2 text-industrial-700 dark:text-industrial-300">
-                Interface Theme
-              </label>
-              <Dropdown 
-                value={theme}
-                onChange={(val) => setTheme(val as any)}
-                options={[
-                    { value: "light", label: "Light Mode" },
-                    { value: "dark", label: "Dark Mode" },
-                    { value: "system", label: "System Default" }
-                ]}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2 text-industrial-700 dark:text-industrial-300">
+              <label className="block text-sm font-medium mb-2 text-industrial-300">
                 Refresh Interval
               </label>
               <Dropdown 
@@ -173,7 +155,7 @@ export const SystemConfigSection: React.FC = () => {
             </div>
             
             <div>
-              <label className="block text-sm font-medium mb-2 text-industrial-700 dark:text-industrial-300">
+              <label className="block text-sm font-medium mb-2 text-industrial-300">
                 Temperature Unit
               </label>
                <Dropdown 

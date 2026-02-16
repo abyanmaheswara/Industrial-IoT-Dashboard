@@ -11,10 +11,10 @@ export const TrendChart: React.FC<TrendChartProps> = ({ data, title, dataKeys })
   return (
     <div className="card p-6 h-full flex flex-col">
       <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-medium text-industrial-900 dark:text-white">{title}</h3>
+        <h3 className="text-lg font-medium text-white">{title}</h3>
         {/* Placeholder for controls */}
         <div className="flex space-x-2">
-            <select className="bg-industrial-100 dark:bg-industrial-700 border border-industrial-300 dark:border-industrial-600 text-xs text-industrial-900 dark:text-white rounded px-2 py-1 focus:outline-none focus:border-brand-500">
+            <select className="bg-industrial-800 border border-industrial-700 text-xs text-white rounded px-2 py-1 focus:outline-none focus:border-brand-500">
                 <option>Last 24 Hours</option>
                 <option>Last 7 Days</option>
                 <option>Last 30 Days</option>
@@ -36,19 +36,19 @@ export const TrendChart: React.FC<TrendChartProps> = ({ data, title, dataKeys })
                 </linearGradient>
               ))}
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#2a343c" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#473c31" vertical={false} opacity={0.3} />
             <XAxis 
               dataKey="time" 
-              stroke="#688397"
-              tick={{ fontSize: 12 }}
+              stroke="#826f5a"
+              tick={{ fontSize: 10, fill: '#826f5a' }}
             />
             <YAxis 
-               stroke="#688397"
-               tick={{ fontSize: 12 }}
+               stroke="#826f5a"
+               tick={{ fontSize: 10, fill: '#826f5a' }}
             />
             <Tooltip 
-              contentStyle={{ backgroundColor: '#151a1e', borderColor: '#2a343c', color: '#f4f6f8' }}
-              labelStyle={{ color: '#879cac' }}
+              contentStyle={{ backgroundColor: '#1a1510', borderColor: '#a87932', borderRadius: '8px', border: '1px solid rgba(168, 121, 50, 0.3)', color: '#f2e9d9' }}
+              labelStyle={{ color: '#a87932', fontWeight: 'bold' }}
             />
             <Legend />
             {dataKeys.map((k) => (

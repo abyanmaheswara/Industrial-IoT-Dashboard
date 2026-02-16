@@ -23,12 +23,12 @@ export const AlertStats: React.FC<AlertStatsProps> = ({ stats }) => {
                 </div>
             </div>
 
-             <div className="card p-4 flex items-center justify-between bg-amber-900/10 border-amber-500/30">
+             <div className="card p-4 flex items-center justify-between bg-brand-900/10 border-brand-500/20">
                 <div>
                    <p className="text-industrial-400 text-xs uppercase font-bold">Warnings</p>
-                   <p className="text-2xl font-bold text-amber-500">{stats.warning}</p>
+                   <p className="text-2xl font-bold text-brand-500">{stats.warning}</p>
                 </div>
-                 <div className="p-3 bg-amber-500/20 rounded-full text-amber-500">
+                 <div className="p-3 bg-brand-500/10 rounded-full text-brand-500">
                     <AlertTriangle size={24} />
                 </div>
             </div>
@@ -43,12 +43,12 @@ export const AlertStats: React.FC<AlertStatsProps> = ({ stats }) => {
                 </div>
             </div>
 
-             <div className="card p-4 flex items-center justify-between">
+             <div className="card p-4 flex items-center justify-between border-brand-500/10">
                  <div>
                    <p className="text-industrial-400 text-xs uppercase font-bold">Avg Response</p>
-                   <p className="text-2xl font-bold text-industrial-900 dark:text-white">{stats.avgResponse}</p>
+                   <p className="text-2xl font-bold text-white">{stats.avgResponse}</p>
                 </div>
-                <div className="p-3 bg-industrial-700/50 rounded-full text-industrial-400">
+                <div className="p-3 bg-brand-500/10 rounded-full text-brand-500">
                     <Clock size={24} />
                 </div>
             </div>

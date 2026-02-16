@@ -19,15 +19,15 @@ function LogoWithText({ size = 'md', showTagline = false }: LogoWithTextProps) {
       <Logo size={config.logo} />
       <div>
         <h1 className={`${config.text} font-bold tracking-tight`}>
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-700 via-orange-600 to-orange-500">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-700 via-brand-500 to-brand-400">
             FACTORY
           </span>
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-600">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-brand-700">
             FORGE
           </span>
         </h1>
         {showTagline && (
-          <p className={`${config.tagline} text-gray-600 dark:text-gray-400 font-medium`}>
+          <p className={`${config.tagline} text-industrial-400 font-medium`}>
             Industrial IoT Platform
           </p>
         )}

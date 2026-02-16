@@ -13,30 +13,30 @@ function Logo({ size = 40 }: { size?: number }) {
       {/* Factory Silhouette */}
       <path
         d="M25 65 L25 45 L35 45 L35 40 L45 40 L45 35 L55 35 L55 40 L65 40 L65 45 L75 45 L75 65 Z"
-        fill="#4A2C2A"
+        fill="#382810"
         opacity="0.8"
       />
       
       {/* Chimney Smoke */}
       <path
         d="M40 30 Q42 25 40 20"
-        stroke="#FF8C42"
+        stroke="#a87932"
         strokeWidth="2"
         strokeLinecap="round"
         opacity="0.6"
       />
       <path
         d="M60 35 Q62 30 60 25"
-        stroke="#FF8C42"
+        stroke="#a87932"
         strokeWidth="2"
         strokeLinecap="round"
         opacity="0.6"
       />
       
-      {/* Gear Element - Orange */}
+      {/* Gear Element - Bronze */}
       <g transform="translate(50, 75)">
-        <circle r="8" fill="#FF6B35" />
-        <circle r="4" fill="#8B4513" />
+        <circle r="8" fill="#a87932" />
+        <circle r="4" fill="#382810" />
         {/* Gear teeth */}
         {[0, 60, 120, 180, 240, 300].map((angle, i) => {
           const rad = (angle * Math.PI) / 180;
@@ -49,34 +49,34 @@ function Logo({ size = 40 }: { size?: number }) {
               y={y - 1.5}
               width="3"
               height="3"
-              fill="#FF8C42"
+              fill="#a87932"
               transform={`rotate(${angle} ${x} ${y})`}
             />
           );
         })}
       </g>
       
-      {/* Circuit Lines - Orange */}
+      {/* Circuit Lines - Bronze */}
       <path
         d="M20 55 L30 55 M70 55 L80 55"
-        stroke="#FF6B35"
+        stroke="#a87932"
         strokeWidth="1.5"
         opacity="0.7"
       />
-      <circle cx="30" cy="55" r="2" fill="#FF8C42" />
-      <circle cx="70" cy="55" r="2" fill="#FF8C42" />
+      <circle cx="30" cy="55" r="2" fill="#a87932" />
+      <circle cx="70" cy="55" r="2" fill="#a87932" />
       
       {/* IoT Connection Dots */}
-      <circle cx="35" cy="50" r="1.5" fill="#FF6B35" opacity="0.8" />
-      <circle cx="65" cy="50" r="1.5" fill="#FF6B35" opacity="0.8" />
-      <circle cx="50" cy="42" r="1.5" fill="#FF6B35" opacity="0.8" />
+      <circle cx="35" cy="50" r="1.5" fill="#a87932" opacity="0.8" />
+      <circle cx="65" cy="50" r="1.5" fill="#a87932" opacity="0.8" />
+      <circle cx="50" cy="42" r="1.5" fill="#a87932" opacity="0.8" />
       
       {/* Gradients */}
       <defs>
         <linearGradient id="metalBrown" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style={{ stopColor: '#8B4513', stopOpacity: 1 }} />
-          <stop offset="50%" style={{ stopColor: '#A0522D', stopOpacity: 1 }} />
-          <stop offset="100%" style={{ stopColor: '#6B3410', stopOpacity: 1 }} />
+          <stop offset="0%" style={{ stopColor: '#705020', stopOpacity: 1 }} />
+          <stop offset="50%" style={{ stopColor: '#a87932', stopOpacity: 1 }} />
+          <stop offset="100%" style={{ stopColor: '#382810', stopOpacity: 1 }} />
         </linearGradient>
       </defs>
     </svg>

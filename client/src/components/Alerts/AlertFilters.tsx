@@ -26,8 +26,8 @@ export const AlertFilters: React.FC<AlertFiltersProps> = ({
                     type="text" 
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search alerts by sensor name or ID..." 
-                    className="w-full pl-10 pr-4 py-2 bg-industrial-50 dark:bg-industrial-950 border border-industrial-300 dark:border-industrial-800 rounded-md text-industrial-900 dark:text-white focus:outline-none focus:border-brand-500 placeholder-industrial-400 dark:placeholder-industrial-600"
+                    placeholder="Search logs by sensor or ID..." 
+                    className="w-full pl-10 pr-4 py-2 bg-industrial-950/50 border border-brand-500/10 rounded-lg text-white font-mono text-xs focus:outline-none focus:border-brand-500/50 placeholder-brand-900/30 transition-all"
                 />
             </div>
             
@@ -36,20 +36,20 @@ export const AlertFilters: React.FC<AlertFiltersProps> = ({
                     onClick={() => setFilterType(filterType === 'all' ? 'warning' : 'all')}
                     className={`flex items-center space-x-2 px-3 py-2 rounded border transition-colors whitespace-nowrap ${
                         filterType === 'warning' 
-                            ? 'bg-yellow-100 dark:bg-yellow-900/30 border-yellow-400 dark:border-yellow-600 text-yellow-700 dark:text-yellow-500' 
-                            : 'bg-industrial-100 dark:bg-industrial-800 border-industrial-300 dark:border-industrial-700 text-industrial-700 dark:text-industrial-300 hover:text-industrial-900 dark:hover:text-white'
+                            ? 'bg-brand-500/10 border-brand-500/40 text-brand-400 shadow-[0_0_15px_rgba(168,121,50,0.15)]' 
+                            : 'bg-black/20 border-brand-500/10 text-brand-700 hover:text-brand-400 hover:bg-brand-500/5'
                     }`}
                 >
                     <Filter size={16} />
-                    <span className="text-sm">Warnings</span>
+                    <span className="text-sm font-bold tracking-tight">Warnings</span>
                 </button>
                 
                  <button 
                     onClick={() => setShowCriticalOnly(!showCriticalOnly)}
-                    className={`px-3 py-2 border rounded text-sm whitespace-nowrap transition-colors flex items-center ${
+                    className={`px-3 py-2 border rounded text-sm font-bold whitespace-nowrap transition-colors flex items-center ${
                         showCriticalOnly 
-                            ? 'bg-red-100 dark:bg-red-900/30 border-red-400 dark:border-red-600 text-red-700 dark:text-red-500' 
-                            : 'bg-industrial-100 dark:bg-industrial-900 border-industrial-300 dark:border-industrial-700 text-industrial-700 dark:text-industrial-400 hover:bg-red-50 dark:hover:bg-red-900/10 hover:text-red-600 dark:hover:text-red-400'
+                            ? 'bg-red-950/30 border-red-500 text-red-500 ring-1 ring-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.1)]' 
+                            : 'bg-industrial-800 border-industrial-700 text-industrial-400 hover:bg-red-900/10 hover:text-red-500'
                     }`}
                 >
                     <AlertTriangle size={16} className="mr-2" />

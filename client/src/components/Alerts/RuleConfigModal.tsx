@@ -31,7 +31,8 @@ export const RuleConfigModal: React.FC<RuleConfigModalProps> = ({ isOpen, onClos
   const fetchSensors = async () => {
     try {
       setLoading(true);
-      const res = await fetch('http://localhost:3001/api/sensors');
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const res = await fetch(`${API_URL}/api/sensors`);
       const data = await res.json();
       setSensors(data);
     } catch (err) {
@@ -50,7 +51,8 @@ export const RuleConfigModal: React.FC<RuleConfigModalProps> = ({ isOpen, onClos
 
   const handleSave = async (sensor: SensorConfig) => {
     try {
-      const res = await fetch(`http://localhost:3001/api/sensors/${sensor.id}`, {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const res = await fetch(`${API_URL}/api/sensors/${sensor.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(sensor)
@@ -69,53 +71,54 @@ export const RuleConfigModal: React.FC<RuleConfigModalProps> = ({ isOpen, onClos
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-industrial-50 dark:bg-industrial-900 border border-industrial-200 dark:border-industrial-700 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md animate-fadeIn p-4">
+      <div className="bg-industrial-900 border border-brand-500/20 rounded-xl shadow-[0_0_50px_rgba(0,0,0,0.8)] w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-brand-500/[0.02] to-transparent pointer-events-none" />
         
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-industrial-200 dark:border-industrial-800 bg-industrial-100/50 dark:bg-industrial-800/50">
+        <div className="flex justify-between items-center p-6 border-b border-industrial-800 bg-industrial-800/30 relative z-10">
           <div className="flex items-center space-x-3">
-             <div className="p-2 bg-brand-100 dark:bg-brand-900/30 rounded-lg border border-brand-200 dark:border-brand-500/30">
-                <AlertTriangle className="text-brand-600 dark:text-brand-400" size={24} />
+             <div className="p-2 bg-brand-900/40 rounded-lg border border-brand-500/30">
+                <AlertTriangle className="text-brand-500" size={24} />
              </div>
              <div>
-                <h2 className="text-xl font-bold text-industrial-900 dark:text-white">Configure Alert Rules</h2>
-                <p className="text-sm text-industrial-500 dark:text-industrial-400">Define operational thresholds for sensors</p>
+                <h2 className="text-xl font-bold text-white uppercase tracking-wider">Configure Alert Rules</h2>
+                <p className="text-sm text-industrial-400">Define operational thresholds for sensors</p>
              </div>
           </div>
-          <button onClick={onClose} className="text-industrial-400 hover:text-industrial-900 dark:hover:text-white transition-colors">
+          <button onClick={onClose} className="text-brand-700 hover:text-white transition-colors">
             <X size={24} />
           </button>
         </div>
 
         {/* Body */}
-        <div className="p-6 overflow-y-auto flex-1">
+        <div className="p-6 overflow-y-auto flex-1 relative z-10">
           {loading ? (
-            <div className="text-center py-10 text-industrial-400">Loading configurations...</div>
+            <div className="text-center py-10 text-industrial-500">Loading configurations...</div>
           ) : error ? (
-            <div className="text-center py-10 text-red-400">{error}</div>
+            <div className="text-center py-10 text-red-500">{error}</div>
           ) : (
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="text-industrial-500 dark:text-industrial-400 text-sm border-b border-industrial-200 dark:border-industrial-800">
-                  <th className="py-3 font-medium">Sensor Name</th>
-                  <th className="py-3 font-medium">Min Value</th>
-                  <th className="py-3 font-medium">Max Value</th>
-                  <th className="py-3 font-medium text-yellow-600 dark:text-yellow-500">Threshold (Critical)</th>
-                  <th className="py-3 font-medium text-right">Actions</th>
+                <tr className="text-industrial-400 text-xs uppercase tracking-widest border-b border-industrial-800">
+                  <th className="py-4 font-bold">Sensor</th>
+                  <th className="py-4 font-bold">Min</th>
+                  <th className="py-4 font-bold">Max</th>
+                  <th className="py-4 font-bold text-brand-500">Critical Threshold</th>
+                  <th className="py-4 font-bold text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-industrial-200 dark:divide-industrial-800">
+              <tbody className="divide-y divide-industrial-800">
                 {sensors.map(sensor => (
-                  <tr key={sensor.id} className="group hover:bg-industrial-100 dark:hover:bg-industrial-800/30 transition-colors">
-                    <td className="py-4 text-industrial-900 dark:text-white font-medium">
+                  <tr key={sensor.id} className="group hover:bg-industrial-800/40 transition-colors">
+                    <td className="py-4 text-white font-bold">
                         {sensor.name}
-                        <div className="text-xs text-industrial-500 font-normal">{sensor.id}</div>
+                        <div className="text-[10px] text-industrial-600 font-mono tracking-tighter">{sensor.id.toUpperCase()}</div>
                     </td>
                     <td className="py-4">
                         <input 
                             type="number" 
-                            className="bg-industrial-200 dark:bg-industrial-950 border border-industrial-300 dark:border-industrial-700 rounded px-2 py-1 w-24 text-industrial-900 dark:text-white text-sm focus:border-brand-500 focus:outline-none"
+                            className="bg-industrial-950 border border-industrial-700 rounded px-2 py-1.5 w-20 text-white text-xs focus:border-brand-500 focus:outline-none transition-colors"
                             value={sensor.min}
                             onChange={(e) => handleChange(sensor.id, 'min', e.target.value)}
                         />
@@ -123,7 +126,7 @@ export const RuleConfigModal: React.FC<RuleConfigModalProps> = ({ isOpen, onClos
                     <td className="py-4">
                          <input 
                             type="number" 
-                            className="bg-industrial-200 dark:bg-industrial-950 border border-industrial-300 dark:border-industrial-700 rounded px-2 py-1 w-24 text-industrial-900 dark:text-white text-sm focus:border-brand-500 focus:outline-none"
+                            className="bg-industrial-950 border border-industrial-700 rounded px-2 py-1.5 w-20 text-white text-xs focus:border-brand-500 focus:outline-none transition-colors"
                             value={sensor.max}
                             onChange={(e) => handleChange(sensor.id, 'max', e.target.value)}
                         />
@@ -131,7 +134,7 @@ export const RuleConfigModal: React.FC<RuleConfigModalProps> = ({ isOpen, onClos
                     <td className="py-4">
                          <input 
                             type="number" 
-                            className="bg-industrial-200 dark:bg-industrial-950 border border-industrial-300 dark:border-industrial-700 rounded px-2 py-1 w-24 text-yellow-600 dark:text-yellow-500 font-bold text-sm focus:border-yellow-500 focus:outline-none"
+                            className="bg-industrial-950 border border-brand-500/20 rounded px-2 py-1.5 w-24 text-brand-500 font-black text-xs focus:border-brand-500 focus:outline-none transition-colors"
                             value={sensor.threshold}
                             onChange={(e) => handleChange(sensor.id, 'threshold', e.target.value)}
                         />
@@ -139,8 +142,8 @@ export const RuleConfigModal: React.FC<RuleConfigModalProps> = ({ isOpen, onClos
                     <td className="py-4 text-right">
                         <button 
                             onClick={() => handleSave(sensor)}
-                            className="text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 p-2 hover:bg-brand-100 dark:hover:bg-brand-900/20 rounded-full transition-colors"
-                            title="Save Changes"
+                            className="text-brand-500 hover:text-brand-300 p-2.5 hover:bg-brand-500/10 rounded-lg transition-all border border-transparent hover:border-brand-500/20"
+                            title="Commit Changes"
                         >
                             <Save size={18} />
                         </button>
@@ -153,10 +156,10 @@ export const RuleConfigModal: React.FC<RuleConfigModalProps> = ({ isOpen, onClos
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-industrial-200 dark:border-industrial-800 bg-industrial-100 dark:bg-industrial-900 flex justify-end">
+        <div className="p-4 border-t border-industrial-800 bg-industrial-950 flex justify-end relative z-10">
             <button 
                 onClick={onClose}
-                className="px-4 py-2 bg-industrial-200 dark:bg-industrial-800 text-industrial-900 dark:text-white rounded hover:bg-industrial-300 dark:hover:bg-industrial-700 transition"
+                className="px-6 py-2 bg-brand-950 hover:bg-brand-500/10 text-brand-100 rounded-lg text-sm font-bold transition-all border border-brand-500/30 shadow-inner"
             >
                 Done
             </button>

@@ -105,21 +105,21 @@ export const ProfileSection: React.FC = () => {
 
     return (
         <div className="card p-6 mb-6">
-            <div className="flex items-center gap-3 mb-6 pb-2 border-b border-industrial-200 dark:border-industrial-700">
-                <User className="text-brand-600 dark:text-brand-400" size={20} />
-                <h3 className="text-lg font-medium text-industrial-100 dark:text-industrial-50">User Profile</h3>
+            <div className="flex items-center gap-3 mb-6 pb-2 border-b border-industrial-800">
+                <User className="text-brand-500" size={20} />
+                <h3 className="text-lg font-bold text-white uppercase tracking-wider">User Profile</h3>
             </div>
             
             <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
                 <div className="flex flex-col items-center gap-2">
                     <div className="relative group cursor-pointer" onClick={triggerFileInput}>
-                        <div className="w-24 h-24 rounded-full bg-industrial-200 dark:bg-industrial-800 flex items-center justify-center text-4xl font-bold text-industrial-500 dark:text-industrial-500 border-2 border-industrial-300 dark:border-industrial-700 overflow-hidden">
+                        <div className="w-24 h-24 rounded-full bg-industrial-950 flex items-center justify-center text-4xl font-bold text-industrial-700 border-2 border-industrial-800 overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.5)] ring-2 ring-brand-500/10 group-hover:ring-brand-500/30 transition-all">
                             {isUploading ? (
                                 <Loader className="animate-spin text-brand-500" size={32} />
                             ) : avatar ? (
                                 <img src={avatar} alt="Profile" className="w-full h-full object-cover" />
                             ) : (
-                                <span>{user?.username?.charAt(0).toUpperCase() || 'U'}</span>
+                                <span className="text-brand-500/50">{user?.username?.charAt(0).toUpperCase() || 'U'}</span>
                             )}
                         </div>
                         {!isUploading && (
@@ -139,7 +139,7 @@ export const ProfileSection: React.FC = () => {
                     {avatar && !isUploading && (
                         <button
                             onClick={handleDeleteAvatar}
-                            className="flex items-center gap-1 px-3 py-1 text-xs text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                            className="flex items-center gap-1 px-3 py-1 text-xs text-red-500 hover:bg-red-950/20 rounded transition-colors font-bold uppercase tracking-widest"
                         >
                             <Trash2 size={14} />
                             Remove Photo
@@ -153,36 +153,36 @@ export const ProfileSection: React.FC = () => {
                 <div className="flex-1 space-y-4 w-full">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-medium text-industrial-600 dark:text-industrial-400 mb-1">Username</label>
-                            <div className="flex items-center bg-industrial-50 dark:bg-industrial-900 border border-industrial-200 dark:border-industrial-800 rounded px-3 py-2 text-industrial-900 dark:text-white">
-                                <User size={16} className="mr-2 text-industrial-500 dark:text-industrial-500" />
-                                <span>{user?.username || 'Guest'}</span>
+                            <label className="block text-[10px] font-black text-industrial-500 uppercase tracking-widest mb-1">Username</label>
+                            <div className="flex items-center bg-industrial-950 border border-industrial-800 rounded px-3 py-2 text-white">
+                                <User size={14} className="mr-2 text-brand-500" />
+                                <span className="text-sm font-bold tracking-tight">{user?.username || 'Guest'}</span>
                             </div>
                         </div>
                          <div>
-                            <label className="block text-xs font-medium text-industrial-600 dark:text-industrial-400 mb-1">User ID</label>
-                            <div className="flex items-center bg-industrial-50 dark:bg-industrial-900 border border-industrial-200 dark:border-industrial-800 rounded px-3 py-2 text-industrial-900 dark:text-white">
-                                <Mail size={16} className="mr-2 text-industrial-500 dark:text-industrial-500" />
-                                <span>{user?.id ? `USER-${user.id}` : 'N/A'}</span>
+                            <label className="block text-[10px] font-black text-industrial-500 uppercase tracking-widest mb-1">User ID</label>
+                            <div className="flex items-center bg-industrial-950 border border-industrial-800 rounded px-3 py-2 text-white">
+                                <Mail size={14} className="mr-2 text-brand-500" />
+                                <span className="text-sm font-mono">{user?.id ? `USER-${user.id}` : 'N/A'}</span>
                             </div>
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-industrial-600 dark:text-industrial-400 mb-1">Role</label>
-                            <div className="flex items-center bg-industrial-50 dark:bg-industrial-900 border border-industrial-200 dark:border-industrial-800 rounded px-3 py-2 text-industrial-900 dark:text-white">
-                                <Shield size={16} className="mr-2 text-industrial-500 dark:text-industrial-500" />
-                                <span className="capitalize">{user?.role || 'Viewer'}</span>
+                            <label className="block text-[10px] font-black text-industrial-500 uppercase tracking-widest mb-1">Role</label>
+                            <div className="flex items-center bg-industrial-950 border border-industrial-800 rounded px-3 py-2 text-white">
+                                <Shield size={14} className="mr-2 text-brand-500" />
+                                <span className="text-sm font-bold uppercase tracking-tighter text-brand-500">{user?.role || 'Viewer'}</span>
                             </div>
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-industrial-600 dark:text-industrial-400 mb-1">Department</label>
-                            <div className="bg-industrial-50 dark:bg-industrial-900 border border-industrial-200 dark:border-industrial-800 rounded px-3 py-2 text-industrial-900 dark:text-white">
-                                <span>General Operations</span>
+                            <label className="block text-[10px] font-black text-industrial-500 uppercase tracking-widest mb-1">Department</label>
+                            <div className="bg-industrial-950 border border-industrial-800 rounded px-3 py-2 text-white">
+                                <span className="text-sm">General Operations</span>
                             </div>
                         </div>
                     </div>
                     
                     <div className="flex justify-end mt-4">
-                        <button className="px-4 py-2 bg-gradient-to-r from-brand-brown to-brand-500 hover:from-brand-brown-dark hover:to-brand-600 text-white text-sm font-medium rounded transition-colors" onClick={() => alert("Profile updated!")}>
+                        <button className="px-6 py-2 bg-gradient-to-r from-brand-700 to-brand-500 hover:from-brand-600 hover:to-brand-400 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-all shadow-[0_0_15px_rgba(168,121,50,0.2)]" onClick={() => alert("Profile updated!")}>
                             Save Changes
                         </button>
                     </div>

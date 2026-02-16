@@ -18,7 +18,8 @@ export const Alerts: React.FC = () => {
 
   const fetchAlerts = async () => {
     try {
-        const res = await fetch('http://localhost:3001/api/alerts');
+        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const res = await fetch(`${API_URL}/api/alerts`);
         const data = await res.json();
         setAlerts(data);
 
@@ -94,12 +95,12 @@ export const Alerts: React.FC = () => {
     <div className="p-6">
        <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-industrial-900 dark:text-white">Alerts Management</h1>
+          <h1 className="text-2xl font-bold text-white uppercase tracking-widest">Alerts Management</h1>
           <p className="text-industrial-400 text-sm mt-1">Monitor and respond to system alerts</p>
         </div>
         <button 
             onClick={() => setIsConfigOpen(true)}
-            className="px-4 py-2 bg-industrial-100 dark:bg-industrial-800 hover:bg-industrial-200 dark:hover:bg-industrial-700 text-industrial-900 dark:text-white rounded-md text-sm font-medium transition-colors border border-industrial-300 dark:border-industrial-700 flex items-center"
+            className="px-4 py-2 bg-industrial-800 hover:bg-industrial-700 text-white rounded-md text-sm font-medium transition-colors border border-industrial-700 flex items-center shadow-lg"
         >
             <span className="mr-2">⚙️</span> Configure Rules
         </button>
