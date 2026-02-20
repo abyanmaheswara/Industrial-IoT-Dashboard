@@ -4,6 +4,13 @@ require("dotenv").config({ path: path.join(__dirname, "../.env") });
 
 const isProduction = process.env.NODE_ENV === "production";
 
+console.log("[DB] Initializing pool...");
+if (process.env.DATABASE_URL) {
+  console.log("[DB] DATABASE_URL detected (length: " + process.env.DATABASE_URL.length + ")");
+} else {
+  console.log("[DB] DATABASE_URL NOT FOUND, using individual variables");
+}
+
 const pool = process.env.DATABASE_URL
   ? new Pool({
       connectionString: process.env.DATABASE_URL,
@@ -20,7 +27,8 @@ const pool = process.env.DATABASE_URL
 // Helper to query DB
 const query = (text, params) =>
   pool.query(text, params).catch((err) => {
-    console.error("[DB ERROR]", err.message);
+    console.error("[DB ERROR] Full Error:", err);
+    console.error("[DB ERROR] Message:", err.message);
     throw err;
   });
 
