@@ -4,6 +4,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Filter, Download, FileText, Table as TableIcon, Activity, Thermometer, Zap, Gauge, Database, Droplets, Power } from "lucide-react";
 import { socket } from "../socket";
 import type { SensorData } from "../types/sensor";
+import { API_URL } from "../config";
 import { utils, writeFile } from "xlsx";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -40,7 +41,6 @@ export const Analytics = () => {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
       const token = localStorage.getItem("token");
       const res = await fetch(`${API_URL}/api/sensors/history?sensorId=${selectedSensor}&range=${dateRange}`, {
         headers: { Authorization: `Bearer ${token}` },

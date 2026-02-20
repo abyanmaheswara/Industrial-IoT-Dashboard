@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Lock, User, AlertTriangle, ShieldCheck, Activity, Key, ChevronDown } from "lucide-react";
+import { API_URL } from "../config";
 
 export const Register: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -41,7 +42,6 @@ export const Register: React.FC = () => {
     setLoading(true);
 
     try {
-      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { BrowserRouter as Router, Routes, Route, Outlet, useOutletContext } from "react-router-dom";
 import { socket } from "./socket";
 import type { SensorData } from "./types/sensor";
+import { API_URL } from "./config";
 
 // Context
 import { AuthProvider } from "./context/AuthContext";
@@ -32,8 +33,6 @@ const DashboardData = () => {
   useEffect(() => {
     sensorDataRef.current = sensorData;
   }, [sensorData]);
-
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
   const fetchData = useCallback(async () => {
     const token = localStorage.getItem("token");

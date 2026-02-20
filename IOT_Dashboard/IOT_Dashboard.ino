@@ -11,9 +11,13 @@ const char* ssid = "OPPO Reno8";
 const char* password = "12345678";        
 
 // --- PROTOCOL CONFIGURATION (MQTT) ---
-// --- PROTOCOL CONFIGURATION (MQTT) ---
-const char* mqtt_server = "10.158.49.141"; 
+const char* mqtt_server = "industrial-iot-dashboard-production.up.railway.app"; 
 const int mqtt_port = 1883;
+
+// --- SECURITY PROTOCOL (CREDENTIALS) ---
+// Login dulu di web factoryforge.vercel.app, terus ambil Token & ID-nya
+const char* mqtt_user = "3"; // Sesuaikan dengan ID abang (biasanya 1 atau 3)
+const char* mqtt_pass = "PASTE_TOKEN_JWT_DARI_LOCAL_STORAGE_DI_SINI"; 
 
 // --- SECURITY PROTOCOL (CREDENTIALS) ---
 // [IMPORTANT] User ID abang adalah 3 (diliat dari isi token tadi)
