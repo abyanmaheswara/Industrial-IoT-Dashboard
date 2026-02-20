@@ -11,6 +11,7 @@ const jwt = require("jsonwebtoken");
 const mqtt = require("./mqtt");
 
 const app = express();
+app.set("trust proxy", 1); // Trust Railway proxy for rate limiting
 const server = http.createServer(app);
 
 // Rate Limiting Configuration
