@@ -1,106 +1,86 @@
-import React from 'react';
-import { AlertTriangle, CheckCircle, Brain } from 'lucide-react';
-import type { SensorData } from '../types/sensor';
+import React from "react";
+import { AlertTriangle, ShieldCheck, Activity, Heart } from "lucide-react";
+import type { SensorData } from "../types/sensor";
 
 interface HealthWidgetProps {
-    sensors: SensorData[];
-    aiEnabled: boolean;
+  sensors: SensorData[];
+  aiEnabled: boolean;
 }
 
 export const HealthWidget: React.FC<HealthWidgetProps> = ({ sensors, aiEnabled }) => {
-    // Calculate Average System Health
-    const totalHealth = sensors.reduce((acc, s) => acc + (s.health || 100), 0);
-    const avgHealth = Math.round(totalHealth / (sensors.length || 1));
+  const averageHealth = sensors.length > 0 ? Math.round(sensors.reduce((acc, s) => acc + (s.health || 100), 0) / sensors.length) : 100;
 
-    // Find Anomalies
-    const anomalies = sensors.filter(s => s.isAnomaly);
+  const anomalies = sensors.filter((s) => s.status === "critical" || (s.health && s.health < 40));
 
-    const getHealthColor = (score: number) => {
-        if (score >= 80) return 'text-green-500';
-        if (score >= 50) return 'text-yellow-500';
-        return 'text-red-500';
-    };
+  const getHealthColor = (val: number) => {
+    if (val > 80) return "text-emerald-500";
+    if (val > 50) return "text-brand-main";
+    return "text-red-500";
+  };
 
-    return (
-        <div className="relative group overflow-hidden bg-industrial-950/40 backdrop-blur-xl p-4 rounded-xl border border-brand-500/20 shadow-[0_0_30px_rgba(0,0,0,0.5)] transition-all duration-300 hover:border-brand-500/40">
-            {/* Background Accent */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-brand-500/10 blur-[60px] -mr-10 -mt-10 group-hover:bg-brand-500/20 transition-colors" />
-            
-            {/* Corner Decorative Elements */}
-            <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-brand-500/30 rounded-tl" />
-            <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-brand-500/30 rounded-br" />
+  const getHealthGradient = (val: number) => {
+    if (val > 80) return "from-emerald-600 to-emerald-400";
+    if (val > 50) return "from-brand-main to-brand-light";
+    return "from-red-600 to-red-400";
+  };
 
-            <div className="flex justify-between items-center mb-6 relative z-10">
-                <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-lg bg-brand-900/40 border border-brand-500/30 group-hover:border-brand-500/60 transition-colors shadow-[0_0_15px_rgba(168,121,50,0.1)] group-hover:shadow-[0_0_20px_rgba(168,121,50,0.2)]">
-                        <Brain className="w-6 h-6 text-brand-400 drop-shadow-[0_0_8px_rgba(168,121,50,0.5)]" />
-                    </div>
-                    <div>
-                        <h3 className="text-lg font-bold text-white tracking-wider uppercase">
-                            AI System <span className="text-brand-500">Insights</span>
-                        </h3>
-                        <p className="text-[10px] text-brand-700 font-mono uppercase tracking-[0.2em]">Z-Score Neural Engine</p>
-                    </div>
-                </div>
-                {aiEnabled && (
-                    <div className="flex items-center gap-2 px-3 py-1 bg-brand-950/40 border border-brand-500/20 rounded-full">
-                        <div className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse shadow-[0_0_8px_rgba(168,121,50,0.8)]" />
-                        <span className="text-brand-300 text-[10px] font-bold uppercase tracking-widest">Active</span>
-                    </div>
-                )}
-            </div>
+  return (
+    <div className="card-premium p-8 relative overflow-hidden group shadow-2xl">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-brand-main/5 rotate-45 -mr-16 -mt-16 pointer-events-none group-hover:scale-110 transition-transform duration-700" />
 
-            <div className="flex flex-col gap-6 relative z-10">
-                {/* Health Score Component */}
-                <div className="flex flex-col items-center justify-center p-4 bg-industrial-950/40 border border-brand-900/10 rounded-xl group-hover:border-brand-500/10 transition-colors">
-                    <span className="text-industrial-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-4">Core System Integrity</span>
-                    <div className="relative">
-                        {/* Circular Progress Effect (Subtle) */}
-                        <div className={`text-6xl font-black ${getHealthColor(avgHealth)} drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]`}>
-                            {avgHealth}<span className="text-2xl ml-1 opacity-50">%</span>
-                        </div>
-                    </div>
-                    <div className="mt-4 flex items-center gap-2">
-                        <div className={`h-1.5 w-24 bg-industrial-800 rounded-full overflow-hidden`}>
-                            <div 
-                                className={`h-full transition-all duration-1000 ${avgHealth > 70 ? 'bg-green-500' : avgHealth > 30 ? 'bg-yellow-500' : 'bg-red-500'}`}
-                                style={{ width: `${avgHealth}%` }}
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Anomaly Monitor Area */}
-                <div className="flex flex-col gap-3">
-                    <div className="flex items-center justify-between mb-1">
-                        <h4 className="text-[10px] font-bold text-industrial-400 uppercase tracking-[0.2em]">Neural Anomaly Feed</h4>
-                        <span className="text-[9px] text-industrial-600 font-mono">LIVE_STREAM</span>
-                    </div>
-                    
-                    <div className="space-y-3 max-h-[140px] overflow-y-auto pr-2 custom-scrollbar">
-                        {anomalies.length === 0 ? (
-                            <div className="flex items-center gap-3 p-4 bg-industrial-900/30 border border-green-500/10 rounded-lg text-green-400/80 text-[11px] font-medium leading-relaxed">
-                                <div className="p-1.5 rounded bg-green-950/30 text-green-500">
-                                    <CheckCircle size={14} />
-                                </div>
-                                <p>Operational equilibrium maintained. All parameters within nominal range.</p>
-                            </div>
-                        ) : (
-                            anomalies.map(sensor => (
-                                <div key={sensor.id} className="flex items-center gap-3 p-4 bg-red-950/10 border border-red-500/20 rounded-lg text-red-300 text-[11px] animate-in fade-in slide-in-from-right-2 duration-500">
-                                    <div className="p-1.5 rounded bg-red-900/30 text-red-500 animate-pulse">
-                                        <AlertTriangle size={14} />
-                                    </div>
-                                    <div>
-                                        <p className="font-bold text-red-400 uppercase tracking-wider mb-0.5">{sensor.name}</p>
-                                        <p className="opacity-70 leading-relaxed">Statistical deviation detected. Z-Score: <span className="font-mono text-red-400">{sensor.zScore}</span></p>
-                                    </div>
-                                </div>
-                            ))
-                        )}
-                    </div>
-                </div>
-            </div>
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 bg-white/[0.03] border border-white/5 rounded-xl text-brand-main">
+            <ShieldCheck size={18} />
+          </div>
+          <h3 className="text-[11px] font-black text-white/90 uppercase tracking-[0.3em]">Health Intelligence_v4.2</h3>
         </div>
-    );
+        {aiEnabled && (
+          <div className="flex items-center gap-2 px-3 py-1 bg-brand-main/10 border border-brand-main/20 rounded-md">
+            <span className="text-[9px] font-black text-brand-light uppercase tracking-tighter italic">AI_CORRELATOR: ACTIVE</span>
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-end justify-between mb-6">
+        <div>
+          <div className={`text-5xl font-black mb-2 tracking-tighter ${getHealthColor(averageHealth)}`}>
+            {averageHealth}
+            <span className="text-xl ml-1 font-bold opacity-50">%</span>
+          </div>
+          <p className="text-[10px] font-bold text-industrial-500 uppercase tracking-widest leading-relaxed">
+            System-Wide Operational <br />
+            Stability Matrix
+          </p>
+        </div>
+        <div className="flex flex-col items-end gap-1 mb-1">
+          <Activity size={32} className={`${getHealthColor(averageHealth)} opacity-20`} />
+          <span className="text-[8px] font-mono text-industrial-600 uppercase">UPLINK_NODE: STABLE</span>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="w-full bg-industrial-950 rounded-full h-2 border border-white/[0.03] overflow-hidden shadow-inner p-0.5">
+          <div className={`h-full bg-gradient-to-r ${getHealthGradient(averageHealth)} rounded-full shadow-[0_0_15px_rgba(180,83,9,0.2)] transition-all duration-1000 ease-out`} style={{ width: `${averageHealth}%` }} />
+        </div>
+
+        <div className="flex justify-between items-center bg-white/[0.01] border border-white/5 rounded-xl p-4 group-hover:bg-white/[0.03] transition-all">
+          <div className="flex items-center gap-3">
+            <Heart className="w-4 h-4 text-red-500/50" />
+            <span className="text-[10px] font-bold text-industrial-400 uppercase tracking-widest">Core Integrity</span>
+          </div>
+          <span className="text-[9px] font-mono font-black text-emerald-500 uppercase px-2 py-0.5 border border-emerald-500/20 rounded bg-emerald-500/5">Nominal</span>
+        </div>
+      </div>
+
+      {anomalies.length > 0 && (
+        <div className="mt-6 p-4 bg-red-500/5 border border-red-500/10 rounded-xl flex items-start gap-4 animate-pulse">
+          <AlertTriangle size={18} className="text-red-500 shrink-0 mt-0.5" />
+          <p className="text-[11px] text-red-400 font-bold uppercase leading-relaxed tracking-tighter">AI identifies urgent degradation in node array. Corrective protocol initialization required.</p>
+        </div>
+      )}
+    </div>
+  );
 };
+
+export default HealthWidget;

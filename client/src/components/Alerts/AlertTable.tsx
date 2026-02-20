@@ -1,206 +1,187 @@
-import React, { useState, useEffect } from 'react';
-import { CheckCircle, Eye, Check, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { CheckCircle, Eye, Check, AlertCircle, Clock, ShieldAlert, Activity } from "lucide-react";
 
 interface AlertTableProps {
-    alerts: any[];
-    onRefresh: () => void;
+  alerts: any[];
+  onRefresh: () => void;
 }
 
 export const AlertTable: React.FC<AlertTableProps> = ({ alerts, onRefresh }) => {
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
-    // Reset to page 1 when alerts change
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [alerts]);
+  // Reset to page 1 when alerts change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [alerts]);
 
-    // Calculate pagination
-    const totalPages = Math.ceil(alerts.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const currentAlerts = alerts.slice(startIndex, endIndex);
+  // Calculate pagination
+  const totalPages = Math.ceil(alerts.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentAlerts = alerts.slice(startIndex, endIndex);
 
-    const handlePrevPage = () => {
-        setCurrentPage(prev => Math.max(1, prev - 1));
-    };
+  const handlePrevPage = () => {
+    setCurrentPage((prev) => Math.max(1, prev - 1));
+  };
 
-    const handleNextPage = () => {
-        setCurrentPage(prev => Math.min(totalPages, prev + 1));
-    };
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(totalPages, prev + 1));
+  };
 
-    const handleAction = async (id: number, action: 'acknowledge' | 'resolve') => {
-        try {
-            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-            const status = action === 'acknowledge' ? 'acknowledged' : 'resolved';
-            await fetch(`${API_URL}/api/alerts/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status })
-            });
-            onRefresh();
-        } catch (err) {
-            console.error("Failed to update alert:", err);
-        }
-    };
+  const handleAction = async (id: number, action: "acknowledge" | "resolve") => {
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+      const token = localStorage.getItem("token");
+      const status = action === "acknowledge" ? "acknowledged" : "resolved";
+      await fetch(`${API_URL}/api/alerts/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status }),
+      });
+      onRefresh();
+    } catch (err) {
+      console.error("Failed to update alert:", err);
+    }
+  };
 
-    return (
-        <div className="card overflow-hidden">
-            <div className="overflow-x-auto">
-                <table className="w-full">
-                    <thead>
-                        <tr className="border-b border-industrial-700 bg-industrial-900/50">
-                            <th className="px-6 py-4 text-left text-xs font-bold text-industrial-400 uppercase tracking-widest">Time</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-industrial-400 uppercase tracking-widest">Sensor</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-industrial-400 uppercase tracking-widest">Severity</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-industrial-400 uppercase tracking-widest">Message</th>
-                            <th className="px-6 py-4 text-left text-xs font-bold text-industrial-400 uppercase tracking-widest">Status</th>
-                            <th className="px-6 py-4 text-right text-xs font-bold text-industrial-400 uppercase tracking-widest">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-industrial-800">
-                        {currentAlerts.length === 0 ? (
-                            <tr>
-                                <td colSpan={6} className="px-6 py-12 text-center">
-                                    <AlertCircle className="w-12 h-12 mx-auto mb-3 text-industrial-400 dark:text-industrial-600" />
-                                    <p className="text-industrial-500 dark:text-industrial-400 font-medium">No alerts found</p>
-                                    <p className="text-sm text-industrial-400 dark:text-industrial-500 mt-1">All systems operating normally</p>
-                                </td>
-                            </tr>
-                        ) : (
-                            currentAlerts.map((alert) => (
-                                <tr key={alert.id} className="hover:bg-industrial-800/40 transition-all duration-150 border-b border-industrial-800/50 uppercase">
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="text-xs font-bold text-white tracking-widest">
-                                            {new Date(alert.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}
-                                        </div>
-                                        <div className="text-[10px] text-brand-700 font-mono mt-0.5">
-                                            {new Date(alert.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="flex items-center">
-                                            <div className="w-1.5 h-1.5 rounded-full mr-3 bg-brand-500 shadow-[0_0_8px_rgba(168,121,50,0.5)]"></div>
-                                            <span className="text-xs font-black text-brand-100 tracking-wider">
-                                                {alert.sensor_name || alert.sensor_id}
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {alert.type === 'critical' ? (
-                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-red-600 to-red-700 text-white shadow-sm ring-1 ring-red-500/30">
-                                                <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
-                                                CRITICAL
-                                            </span>
-                                        ) : (
-                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-brand-600 to-brand-700 text-white shadow-sm ring-1 ring-brand-500/30">
-                                                <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
-                                                WARNING
-                                            </span>
-                                        )}
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <p className="text-sm text-industrial-700 dark:text-industrial-300 line-clamp-2">
-                                            {alert.message}
-                                        </p>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {alert.status === 'active' ? (
-                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800">
-                                                <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>
-                                                Active
-                                            </span>
-                                        ) : alert.status === 'acknowledged' ? (
-                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400 border border-brand-200 dark:border-brand-800">
-                                                <CheckCircle size={12} />
-                                                Acknowledged
-                                            </span>
-                                        ) : (
-                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800">
-                                                <Check size={12} />
-                                                Resolved
-                                            </span>
-                                        )}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right">
-                                        <div className="flex justify-end gap-2">
-                                            {alert.status !== 'resolved' && (
-                                                <>
-                                                    {alert.status === 'active' && (
-                                                        <button 
-                                                            onClick={() => handleAction(alert.id, 'acknowledge')}
-                                                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-brand-100 dark:bg-brand-900/30 hover:bg-brand-200 dark:hover:bg-brand-900/50 text-brand-700 dark:text-brand-400 text-xs font-medium rounded-md transition-all duration-150 border border-brand-200 dark:border-brand-800"
-                                                            title="Acknowledge"
-                                                        >
-                                                            <CheckCircle size={14} />
-                                                            Ack
-                                                        </button>
-                                                    )}
-                                                    <button 
-                                                        onClick={() => handleAction(alert.id, 'resolve')}
-                                                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50 text-green-700 dark:text-green-400 text-xs font-medium rounded-md transition-all duration-150 border border-green-200 dark:border-green-800"
-                                                        title="Resolve"
-                                                    >
-                                                        <Check size={14} />
-                                                        Resolve
-                                                    </button>
-                                                </>
-                                            )}
-                                            {alert.status === 'resolved' && (
-                                                <span className="inline-flex items-center gap-1 px-3 py-1.5 text-industrial-400 dark:text-industrial-600 text-xs">
-                                                    <Eye size={14} />
-                                                    Closed
-                                                </span>
-                                            )}
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
-            </div>
-            <div className="bg-industrial-900/40 px-6 py-4 border-t border-industrial-800 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-industrial-500 uppercase font-bold tracking-widest">
-                        Frame <span className="text-white">{startIndex + 1}</span> - <span className="text-white">{Math.min(endIndex, alerts.length)}</span> of <span className="text-white">{alerts.length}</span> entries
-                    </span>
-                </div>
-                <div className="flex items-center gap-1">
-                    <button 
-                        onClick={handlePrevPage}
-                        disabled={currentPage === 1}
-                        className="px-3 py-1.5 border border-industrial-300 dark:border-industrial-700 rounded-md text-sm font-medium text-industrial-700 dark:text-industrial-300 hover:bg-industrial-100 dark:hover:bg-industrial-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-150"
-                    >
-                        Previous
-                    </button>
-                    <div className="flex gap-1 mx-2">
-                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                            const pageNum = i + 1;
-                            return (
-                                <button 
-                                    key={pageNum}
-                                    onClick={() => setCurrentPage(pageNum)}
-                                    className={`w-8 h-8 rounded-md text-sm font-medium transition-all duration-150 ${
-                                        currentPage === pageNum 
-                                            ? 'bg-gradient-to-r from-brand-700 to-brand-500 text-white shadow-sm ring-1 ring-brand-400/50' 
-                                            : 'text-industrial-300 hover:bg-industrial-800 border border-industrial-700'
-                                    }`}
-                                >
-                                    {pageNum}
-                                </button>
-                            );
-                        })}
+  return (
+    <div className="card-premium overflow-hidden border-white/5">
+      <div className="overflow-x-auto custom-scrollbar">
+        <table className="w-full text-left">
+          <thead>
+            <tr className="bg-white/[0.02] border-b border-white/5">
+              <th className="px-8 py-5 text-[10px] font-black text-industrial-500 uppercase tracking-[0.2em]">Timestamp</th>
+              <th className="px-8 py-5 text-[10px] font-black text-industrial-500 uppercase tracking-[0.2em]">Source Node</th>
+              <th className="px-8 py-5 text-[10px] font-black text-industrial-500 uppercase tracking-[0.2em]">Severity</th>
+              <th className="px-8 py-5 text-[10px] font-black text-industrial-500 uppercase tracking-[0.2em]">Telemetry Message</th>
+              <th className="px-8 py-5 text-[10px] font-black text-industrial-500 uppercase tracking-[0.2em]">Protocol Status</th>
+              <th className="px-8 py-5 text-right text-[10px] font-black text-industrial-500 uppercase tracking-[0.2em]">Directives</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-white/[0.02]">
+            {currentAlerts.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="px-8 py-20 text-center opacity-20">
+                  <ShieldAlert className="w-16 h-16 mx-auto mb-4" />
+                  <p className="text-[12px] font-black uppercase tracking-[0.4em]">Zero Deviations Detected</p>
+                  <p className="text-[10px] mt-2 uppercase tracking-widest text-emerald-500">All systems operating within baseline parameters</p>
+                </td>
+              </tr>
+            ) : (
+              currentAlerts.map((alert) => (
+                <tr key={alert.id} className="hover:bg-white/[0.01] transition-colors group">
+                  <td className="px-8 py-5 whitespace-nowrap">
+                    <div className="text-[11px] font-mono text-industrial-400 group-hover:text-industrial-200 transition-colors">
+                      {new Date(alert.created_at).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false })}
                     </div>
-                    <button 
-                        onClick={handleNextPage}
-                        disabled={currentPage === totalPages || totalPages === 0}
-                        className="px-3 py-1.5 border border-industrial-300 dark:border-industrial-700 rounded-md text-sm font-medium text-industrial-700 dark:text-industrial-300 hover:bg-industrial-100 dark:hover:bg-industrial-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-150"
-                    >
-                        Next
-                    </button>
-                </div>
-            </div>
+                    <div className="text-[9px] text-brand-700 font-black uppercase tracking-tighter mt-1">{new Date(alert.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</div>
+                  </td>
+                  <td className="px-8 py-5 whitespace-nowrap">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-1.5 h-1.5 rounded-full ${alert.type === "critical" ? "bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.5)]" : "bg-brand-main shadow-[0_0_8px_rgba(180,83,9,0.5)]"}`}></div>
+                      <span className="text-[11px] font-black text-white uppercase tracking-widest group-hover:text-brand-light transition-colors">{alert.sensor_name || alert.sensor_id}</span>
+                    </div>
+                  </td>
+                  <td className="px-8 py-5 whitespace-nowrap">
+                    {alert.type === "critical" ? (
+                      <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded bg-red-500/10 text-red-500 border border-red-500/20 text-[9px] font-black uppercase tracking-tighter">
+                        <Activity size={10} className="animate-pulse" />
+                        CRITICAL_ERR
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded bg-brand-main/10 text-brand-main border border-brand-main/20 text-[9px] font-black uppercase tracking-tighter">
+                        <AlertCircle size={10} />
+                        WARN_SIG
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-8 py-5 max-w-xs">
+                    <p className="text-[11px] text-industrial-400 group-hover:text-industrial-300 line-clamp-2 transition-colors italic leading-relaxed">"{alert.message}"</p>
+                  </td>
+                  <td className="px-8 py-5 whitespace-nowrap">
+                    {alert.status === "active" ? (
+                      <span className="flex items-center gap-2 text-red-500 text-[10px] font-black uppercase tracking-widest">
+                        <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-ping"></div>
+                        Live_Incident
+                      </span>
+                    ) : alert.status === "acknowledged" ? (
+                      <span className="flex items-center gap-2 text-brand-main text-[10px] font-black uppercase tracking-widest">
+                        <Clock size={12} />
+                        In_Review
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-2 text-emerald-500 text-[10px] font-black uppercase tracking-widest">
+                        <CheckCircle size={12} />
+                        Archived
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-8 py-5 whitespace-nowrap text-right">
+                    <div className="flex justify-end gap-3">
+                      {alert.status !== "resolved" && (
+                        <>
+                          {alert.status === "active" && (
+                            <button
+                              onClick={() => handleAction(alert.id, "acknowledge")}
+                              className="p-2 bg-brand-main/10 hover:bg-brand-main/20 text-brand-main border border-brand-main/20 rounded-lg transition-all"
+                              title="Acknowledge Incident"
+                            >
+                              <Eye size={16} />
+                            </button>
+                          )}
+                          <button onClick={() => handleAction(alert.id, "resolve")} className="p-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 border border-emerald-500/20 rounded-lg transition-all" title="Archive Incident">
+                            <Check size={16} />
+                          </button>
+                        </>
+                      )}
+                      {alert.status === "resolved" && <span className="px-3 py-1.5 rounded bg-white/5 text-industrial-600 text-[10px] font-black uppercase tracking-widest border border-white/5">Locked</span>}
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="bg-white/[0.01] px-8 py-6 border-t border-white/5 flex items-center justify-between">
+        <div className="hidden md:block">
+          <span className="text-[10px] text-industrial-600 uppercase font-black tracking-[0.2em]">
+            Showing{" "}
+            <span className="text-industrial-300 tabular-nums">
+              {startIndex + 1}-{Math.min(endIndex, alerts.length)}
+            </span>{" "}
+            of <span className="text-industrial-300 tabular-nums">{alerts.length}</span> recorded anomalies
+          </span>
         </div>
-    )
-}
+        <div className="flex items-center gap-2">
+          <button onClick={handlePrevPage} disabled={currentPage === 1} className="btn-premium px-4 py-2 disabled:opacity-30 disabled:cursor-not-allowed text-[10px]">
+            PREV_FRAME
+          </button>
+
+          <div className="flex gap-1 mx-4">
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => (
+              <button
+                key={i + 1}
+                onClick={() => setCurrentPage(i + 1)}
+                className={`w-8 h-8 rounded-lg text-[10px] font-black transition-all ${
+                  currentPage === i + 1 ? "bg-brand-main/20 text-brand-light border border-brand-main/40" : "text-industrial-500 hover:text-white border border-transparent"
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
+
+          <button onClick={handleNextPage} disabled={currentPage === totalPages || totalPages === 0} className="btn-premium px-4 py-2 disabled:opacity-30 disabled:cursor-not-allowed text-[10px]">
+            NEXT_FRAME
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};

@@ -1,27 +1,21 @@
-import type { ReactNode } from 'react';
-import { Outlet } from 'react-router-dom';
-import { Sidebar } from './Sidebar';
-import { Header } from './Header';
+import React from "react";
+import { Outlet } from "react-router-dom";
+import { Sidebar } from "./Sidebar";
+import { Header } from "./Header";
 
-interface MainLayoutProps {
-  children?: ReactNode;
-}
-
-function MainLayout({ children }: MainLayoutProps) {
+const MainLayout: React.FC<{ children?: React.ReactNode; mqttStatus?: { connected: boolean; clients: number } }> = ({ children, mqttStatus }) => {
   return (
-    <div className="flex h-screen bg-industrial-950 text-white font-sans selection:bg-brand-500/30">
-      <Sidebar />
-      <div className="flex-1 flex flex-col overflow-hidden relative">
-        <Header />
-        <main className="flex-1 overflow-y-auto bg-industrial-950 relative">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_#705020_0%,_transparent_50%)] opacity-10 pointer-events-none" />
-          <div className="relative z-10 h-full">
-            {children || <Outlet />}
-          </div>
+    <div className="flex h-screen bg-industrial-950 overflow-hidden font-sans">
+      <Sidebar mqttStatus={mqttStatus} />
+      <div className="flex-1 flex flex-col min-w-0 relative">
+        <Header mqttStatus={mqttStatus} />
+        <main className="flex-1 overflow-hidden relative">
+          <div className="absolute inset-0 industrial-grid-premium opacity-10 pointer-events-none" />
+          {children || <Outlet />}
         </main>
       </div>
     </div>
   );
-}
+};
 
 export default MainLayout;

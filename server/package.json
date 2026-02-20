@@ -19,7 +19,7 @@
     "tailwindcss": "^4.1.18"
   },
   "dependencies": {
-    "aedes": "^1.0.0",
+    "aedes": "^0.51.3",
     "aedes-server-factory": "^0.2.1",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",

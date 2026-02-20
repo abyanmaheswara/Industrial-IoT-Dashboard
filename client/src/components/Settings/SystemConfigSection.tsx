@@ -1,173 +1,168 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { createPortal } from 'react-dom';
-
-import { ChevronDown, Settings as SettingsIcon } from 'lucide-react';
+import React, { useEffect, useState, useRef } from "react";
+import { createPortal } from "react-dom";
+import { ChevronDown, Sliders, Timer, Thermometer } from "lucide-react";
 
 interface DropdownProps {
-    value: string;
-    onChange: (value: string) => void;
-    options: { value: string; label: string }[];
+  value: string;
+  onChange: (value: string) => void;
+  options: { value: string; label: string }[];
 }
 
 const Dropdown: React.FC<DropdownProps> = ({ value, onChange, options }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const dropdownRef = useRef<HTMLDivElement>(null);
-    const [coords, setCoords] = useState({ top: 0, left: 0, right: 0, width: 0, align: 'left' });
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [coords, setCoords] = useState({ top: 0, left: 0, right: 0, width: 0, align: "left" });
 
-    // Close on click outside
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setIsOpen(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-    // Update position when opening
-    useEffect(() => {
-        if (isOpen && dropdownRef.current) {
-            const rect = dropdownRef.current.getBoundingClientRect();
-            const alignRight = rect.left > window.innerWidth / 2;
-            
-            setCoords({
-                top: rect.bottom + window.scrollY,
-                left: rect.left + window.scrollX,
-                right: window.innerWidth - rect.right - window.scrollX, // Distance from right edge
-                width: rect.width,
-                align: alignRight ? 'right' : 'left'
-            });
-        }
-    }, [isOpen]);
+  useEffect(() => {
+    if (isOpen && dropdownRef.current) {
+      const rect = dropdownRef.current.getBoundingClientRect();
+      const alignRight = rect.left > window.innerWidth / 2;
 
-    // Handle scroll/resize
-    useEffect(() => {
-        const handleScroll = () => { if (isOpen) setIsOpen(false); };
-        window.addEventListener('scroll', handleScroll, true);
-        window.addEventListener('resize', handleScroll);
-        return () => {
-            window.removeEventListener('scroll', handleScroll, true);
-            window.removeEventListener('resize', handleScroll);
-        };
-    }, [isOpen]);
+      setCoords({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+        right: window.innerWidth - rect.right - window.scrollX,
+        width: rect.width,
+        align: alignRight ? "right" : "left",
+      });
+    }
+  }, [isOpen]);
 
-    const selectedLabel = options.find(o => o.value === value)?.label || value;
+  useEffect(() => {
+    const handleScroll = () => {
+      if (isOpen) setIsOpen(false);
+    };
+    window.addEventListener("scroll", handleScroll, true);
+    window.addEventListener("resize", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll, true);
+      window.removeEventListener("resize", handleScroll);
+    };
+  }, [isOpen]);
 
-    return (
-        <div className="relative" ref={dropdownRef}>
-            <button
-                type="button"
-                onClick={() => setIsOpen(!isOpen)}
-                className="w-full px-4 py-2 flex justify-between items-center rounded-lg border bg-industrial-950 border-industrial-600 text-white focus:outline-none focus:border-brand-500 transition-colors"
-                style={{ minWidth: '0' }} // Allow shrinking if needed
-            >
-                <div className="flex items-center gap-2 overflow-hidden">
-                    <span className="truncate">{selectedLabel}</span>
-                </div>
-                <ChevronDown size={16} className={`flex-shrink-0 transform transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-            </button>
-            
-            {isOpen && createPortal(
-                <div 
-                    className="absolute bg-industrial-900 border border-industrial-700 rounded-lg shadow-xl z-[99999] overflow-hidden"
-                    style={{
-                        top: coords.top + 4,
-                        ...(coords.align === 'left' ? { left: coords.left } : { right: coords.right }),
-                        minWidth: coords.width,
-                        maxHeight: '300px',
-                        overflowY: 'auto'
-                    }}
-                >
-                    {options.map((option) => (
-                        <div
-                            key={option.value}
-                            onClick={(e) => {
-                                e.stopPropagation(); // Prevent closing immediately
-                                onChange(option.value);
-                                setIsOpen(false);
-                            }}
-                            className={`px-4 py-2 cursor-pointer whitespace-nowrap transition-colors ${
-                                option.value === value
-                                    ? 'bg-brand-500/10 text-brand-400 font-bold'
-                                    : 'text-industrial-400 hover:bg-brand-500/5 hover:text-white'
-                            }`}
-                        >
-                            {option.label}
-                        </div>
-                    ))}
-                </div>,
-                document.body
-            )}
-        </div>
-    );
+  const selectedLabel = options.find((o) => o.value === value)?.label || value;
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full px-5 py-4 flex justify-between items-center rounded-xl border bg-industrial-950/60 border-white/5 text-white font-black text-[10px] uppercase tracking-widest focus:outline-none focus:border-brand-main/40 transition-all shadow-inner"
+      >
+        <span className="truncate">{selectedLabel}</span>
+        <ChevronDown size={14} className={`text-brand-main transform transition-transform duration-500 ${isOpen ? "rotate-180" : ""}`} />
+      </button>
+
+      {isOpen &&
+        createPortal(
+          <div
+            className="absolute bg-industrial-950 border border-white/10 rounded-xl shadow-[0_0_50px_rgba(0,0,0,0.9)] z-[99999] overflow-hidden backdrop-blur-2xl"
+            style={{
+              top: coords.top + 8,
+              ...(coords.align === "left" ? { left: coords.left } : { right: coords.right }),
+              minWidth: coords.width,
+              maxHeight: "300px",
+              overflowY: "auto",
+            }}
+          >
+            {options.map((option) => (
+              <div
+                key={option.value}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onChange(option.value);
+                  setIsOpen(false);
+                }}
+                className={`px-5 py-3.5 cursor-pointer text-[10px] font-black uppercase tracking-widest transition-all ${
+                  option.value === value ? "bg-brand-main/10 text-brand-main border-l-2 border-brand-main" : "text-industrial-500 hover:bg-white/5 hover:text-white"
+                }`}
+              >
+                {option.label}
+              </div>
+            ))}
+          </div>,
+          document.body,
+        )}
+    </div>
+  );
 };
 
 export const SystemConfigSection: React.FC = () => {
+  const [refreshInterval, setRefreshInterval] = useState("10");
+  const [tempUnit, setTempUnit] = useState("Celsius");
 
-    const [refreshInterval, setRefreshInterval] = useState('10');
-    const [tempUnit, setTempUnit] = useState('Celsius');
+  useEffect(() => {
+    const savedInterval = localStorage.getItem("settings_refresh_interval");
+    if (savedInterval) setRefreshInterval(savedInterval);
 
-    useEffect(() => {
-        const savedInterval = localStorage.getItem('settings_refresh_interval');
-        if (savedInterval) setRefreshInterval(savedInterval);
+    const savedUnit = localStorage.getItem("settings_temp_unit");
+    if (savedUnit) setTempUnit(savedUnit);
+  }, []);
 
-        const savedUnit = localStorage.getItem('settings_temp_unit');
-        if (savedUnit) setTempUnit(savedUnit);
-    }, []);
+  const handleIntervalChange = (val: string) => {
+    setRefreshInterval(val);
+    localStorage.setItem("settings_refresh_interval", val);
+    window.dispatchEvent(new CustomEvent("settingsChanged", { detail: { refreshInterval: val } }));
+  };
 
-    const handleIntervalChange = (val: string) => {
-        setRefreshInterval(val);
-        localStorage.setItem('settings_refresh_interval', val);
-        window.dispatchEvent(new CustomEvent('settingsChanged', { detail: { refreshInterval: val } }));
-    };
+  const handleUnitChange = (val: string) => {
+    setTempUnit(val);
+    localStorage.setItem("settings_temp_unit", val);
+    window.dispatchEvent(new CustomEvent("settingsChanged", { detail: { tempUnit: val } }));
+  };
 
-    const handleUnitChange = (val: string) => {
-        setTempUnit(val);
-        localStorage.setItem('settings_temp_unit', val);
-        window.dispatchEvent(new CustomEvent('settingsChanged', { detail: { tempUnit: val } }));
-    };
-
-    return (
-        <div className="card p-6 h-full">
-          <div className="flex items-center gap-3 mb-6 pb-2 border-b border-industrial-800">
-            <SettingsIcon className="text-brand-500" size={20} />
-            <h3 className="text-lg font-bold text-white uppercase tracking-wider">
-              System Configuration
-            </h3>
+  return (
+    <div className="card-premium p-8 h-full bg-white/[0.01] border-white/5 flex flex-col justify-between">
+      <div className="space-y-8">
+        <div className="group">
+          <div className="flex items-center gap-3 mb-4">
+            <Timer size={14} className="text-brand-main opacity-50" />
+            <label className="text-[10px] font-black text-industrial-500 uppercase tracking-widest">Telemetry Refresh Cycle</label>
           </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2 text-industrial-300">
-                Refresh Interval
-              </label>
-              <Dropdown 
-                value={refreshInterval}
-                onChange={handleIntervalChange}
-                options={[
-                    { value: "5", label: "5 Seconds" },
-                    { value: "10", label: "10 Seconds" },
-                    { value: "30", label: "30 Seconds" },
-                    { value: "60", label: "1 Minute" }
-                ]}
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium mb-2 text-industrial-300">
-                Temperature Unit
-              </label>
-               <Dropdown 
-                value={tempUnit}
-                onChange={handleUnitChange}
-                options={[
-                    { value: "Celsius", label: "Celsius (°C)" },
-                    { value: "Fahrenheit", label: "Fahrenheit (°F)" }
-                ]}
-              />
-            </div>
-          </div>
+          <Dropdown
+            value={refreshInterval}
+            onChange={handleIntervalChange}
+            options={[
+              { value: "5", label: "05_SEC // HI_FREQ" },
+              { value: "10", label: "10_SEC // OPTIMAL" },
+              { value: "30", label: "30_SEC // ENERGY_SAVER" },
+              { value: "60", label: "60_SEC // LOW_BANDWIDTH" },
+            ]}
+          />
+          <p className="text-[8px] text-industrial-700 font-mono mt-3 uppercase tracking-widest italic leading-relaxed">System logic: Determines the polling frequency for all active hardware nodes.</p>
         </div>
-    );
+
+        <div className="group">
+          <div className="flex items-center gap-3 mb-4">
+            <Thermometer size={14} className="text-brand-main opacity-50" />
+            <label className="text-[10px] font-black text-industrial-500 uppercase tracking-widest">Thermal Metric Scaling</label>
+          </div>
+          <Dropdown
+            value={tempUnit}
+            onChange={handleUnitChange}
+            options={[
+              { value: "Celsius", label: "CELSIUS_INTERNAL (°C)" },
+              { value: "Fahrenheit", label: "FAHRENHEIT_GLOBAL (°F)" },
+            ]}
+          />
+          <p className="text-[8px] text-industrial-700 font-mono mt-3 uppercase tracking-widest italic leading-relaxed">Conversion engine: Affects all thermal telemetry displays and threshold calculations.</p>
+        </div>
+      </div>
+
+      <div className="mt-10 pt-6 border-t border-white/5 flex items-center gap-3 opacity-30">
+        <Sliders size={12} className="text-brand-main" />
+        <span className="text-[9px] font-black uppercase tracking-widest">Config_Engine_Locked</span>
+      </div>
+    </div>
+  );
 };

@@ -1,5 +1,5 @@
-export type SensorType = 'temperature' | 'pressure' | 'vibration' | 'power';
-export type SensorStatus = 'normal' | 'warning' | 'critical';
+export type SensorType = "temperature" | "pressure" | "vibration" | "power" | "humidity";
+export type SensorStatus = "normal" | "warning" | "critical";
 
 export interface SensorData {
   id: string;

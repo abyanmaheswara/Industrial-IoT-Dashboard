@@ -1,58 +1,79 @@
-const Aedes = require('aedes').Aedes;
-const aedes = new Aedes();
-const server = require('net').createServer(aedes.handle);
-const db = require('./db');
+const aedes = require("aedes")();
+const net = require("net");
+const db = require("./db");
 
 const startBroker = (io, onDataReceived) => {
-    const PORT = 1883;
-    const HOST = '0.0.0.0'; // Explicitly bind to all IPv4 interfaces
+  const MQTT_PORT = 1883;
+  const mqttServer = net.createServer(aedes.handle);
 
-    server.listen(PORT, HOST, function () {
-        console.log(`📡 MQTT Broker started on port ${PORT}`);
-    });
+  mqttServer.listen(MQTT_PORT, "0.0.0.0", () => {
+    console.log("✅ MQTT Broker started on port", MQTT_PORT);
+    console.log("📍 Listening on all interfaces (0.0.0.0)");
+  });
 
-    // Authentication (Optional for now, allow all)
-    aedes.authenticate = function (client, username, password, callback) {
-        callback(null, true);
-    };
+  // MQTT Client Connected
+  aedes.on("client", (client) => {
+    console.log("[MQTT] ✅ Client CONNECTED:", client.id);
+    // Count current clients - simple implementation
+    const clientCount = Object.keys(aedes.clients).length;
+    io.emit("mqttStatus", { connected: true, clients: clientCount });
+  });
 
-    // Client Connected
-    aedes.on('client', function (client) {
-        console.log(`[MQTT] Client Connected: ${client ? client.id : client}`);
-    });
+  // MQTT Client Disconnected
+  aedes.on("clientDisconnect", (client) => {
+    console.log("[MQTT] ❌ Client DISCONNECTED:", client.id);
+    const clientCount = Math.max(0, Object.keys(aedes.clients).length - 1);
+    io.emit("mqttStatus", { connected: clientCount > 0, clients: clientCount });
+  });
 
-    // Handle incoming messages
-    aedes.on('publish', async function (packet, client) {
-        if (packet.topic.startsWith('sensors/')) {
-            try {
-                const payload = packet.payload.toString();
-                const data = JSON.parse(payload);
-                
-                // Expecting payload: { id: "temp_01", value: 25.5 }
-                if(data.id && data.value !== undefined) {
-                    const val = parseFloat(data.value);
-                    console.log(`[MQTT] Data received from ${data.id}: ${val}`);
-                    
-                    // 1. Save to Database
-                    await db.saveReading(data.id, val);
+  // MQTT Publish (Message Received)
+  aedes.on("publish", async (packet, client) => {
+    // Skip if internal message or no client
+    if (!client || packet.topic.startsWith("$SYS")) return;
 
-                    // 2. Emit to Socket.io (Real-time Dashboard)
-                    io.emit('sensorUpdate', {
-                        id: data.id,
-                        value: val,
-                        timestamp: new Date()
-                    });
+    const topic = packet.topic;
+    const message = packet.payload.toString();
 
-                    // 3. Trigger Alert/AI Logic (Callback)
-                    if (onDataReceived) {
-                        onDataReceived(data.id, val);
-                    }
-                }
-            } catch (err) {
-                console.error(`[MQTT] Error processing message on ${packet.topic}:`, err.message);
-            }
+    console.log(`[MQTT] 📡 Message on ${topic}: ${message}`);
+
+    try {
+      // Parse JSON payload
+      const data = JSON.parse(message);
+
+      if (data.id && data.value !== undefined) {
+        const val = parseFloat(data.value);
+
+        // 1. Save to Database
+        await db.saveReading(data.id, val);
+
+        // 2. Broadcast to frontend via Socket.io
+        io.emit("hardwareSensorData", {
+          id: data.id,
+          value: val,
+          timestamp: new Date().toISOString(),
+        });
+
+        // 3. Trigger Alert/AI Logic (Callback)
+        if (onDataReceived) {
+          onDataReceived(data.id, val);
         }
-    });
+
+        console.log("[MQTT] ✅ Forwarded to frontend:", data.id, data.value);
+      }
+    } catch (err) {
+      console.log("[MQTT] ⚠️ Not JSON, skipping:", message);
+    }
+  });
+
+  // Protocol Errors
+  aedes.on("connectionError", (client, err) => {
+    console.error("[MQTT] ⚠️ Connection ERROR:", err.message);
+  });
+
+  // MQTT Server Error
+  mqttServer.on("error", (err) => {
+    console.error("[MQTT] ❌ Server ERROR:", err.message);
+  });
 };
 
 module.exports = { startBroker };
