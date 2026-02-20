@@ -1,15 +1,34 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Lock, User, AlertTriangle, ShieldCheck, Activity, Key } from "lucide-react";
+import { Lock, User, AlertTriangle, ShieldCheck, Activity, Key, ChevronDown } from "lucide-react";
 
 export const Register: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState("viewer");
+  const [secretKey, setSecretKey] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
   const navigate = useNavigate();
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsRoleDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const roleOptions = [
+    { value: "viewer", label: "LVL_1: Telemetry_Viewer" },
+    { value: "operator", label: "LVL_2: Command_Operator" },
+    { value: "admin", label: "LVL_3: System_Admin" },
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +45,7 @@ export const Register: React.FC = () => {
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password, role }),
+        body: JSON.stringify({ username, password, role, secretKey }),
       });
 
       const data = await response.json();
@@ -146,25 +165,58 @@ export const Register: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="group">
+                <div className="group relative" ref={dropdownRef}>
                   <label className="block text-[10px] font-black text-industrial-500 uppercase tracking-widest group-focus-within:text-brand-main transition-colors mb-2 px-1">Clearance Priority</label>
                   <div className="relative">
-                    <select
-                      value={role}
-                      onChange={(e) => setRole(e.target.value)}
-                      className="block w-full pl-5 pr-10 py-3.5 bg-industrial-950/40 border border-white/5 rounded-xl text-white font-black text-[10px] uppercase tracking-widest focus:border-brand-main/40 focus:ring-1 focus:ring-brand-main/20 transition-all appearance-none cursor-pointer outline-none"
+                    <button
+                      type="button"
+                      onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
+                      className="w-full pl-5 pr-10 py-3.5 bg-industrial-950/40 border border-white/5 rounded-xl text-white font-black text-[10px] uppercase tracking-widest focus:border-brand-main/40 focus:ring-1 focus:ring-brand-main/20 outline-none flex items-center justify-between transition-all"
                     >
-                      <option value="viewer">LVL_1: Telemetry_Viewer</option>
-                      <option value="operator">LVL_2: Command_Operator</option>
-                      <option value="admin">LVL_3: System_Admin</option>
-                    </select>
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-brand-main">
-                      <svg className="w-4 h-4 fill-current opacity-50" viewBox="0 0 20 20">
-                        <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                      </svg>
-                    </div>
+                      <span className="truncate">{roleOptions.find((o) => o.value === role)?.label}</span>
+                      <ChevronDown size={14} className={`text-brand-main transition-transform duration-500 ${isRoleDropdownOpen ? "rotate-180" : ""}`} />
+                    </button>
+
+                    {isRoleDropdownOpen && (
+                      <div className="absolute top-full left-0 mt-2 w-full bg-industrial-950 border border-white/10 rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] z-[50] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                        {roleOptions.map((option) => (
+                          <button
+                            key={option.value}
+                            type="button"
+                            onClick={() => {
+                              setRole(option.value);
+                              setIsRoleDropdownOpen(false);
+                            }}
+                            className={`w-full text-left px-5 py-3.5 text-[10px] font-black uppercase tracking-widest transition-all ${
+                              role === option.value ? "bg-brand-main/10 text-brand-main border-l-2 border-brand-main" : "text-industrial-400 hover:bg-white/5 hover:text-white"
+                            }`}
+                          >
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
+
+                {(role === "admin" || role === "operator") && (
+                  <div className="group animate-in slide-in-from-top-2 duration-300">
+                    <label className="block text-[10px] font-black text-brand-main uppercase tracking-widest mb-2 px-1">System Access Key</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                        <Key size={15} className="text-brand-main animate-pulse" />
+                      </div>
+                      <input
+                        type="password"
+                        value={secretKey}
+                        onChange={(e) => setSecretKey(e.target.value)}
+                        className="block w-full pl-12 pr-4 py-3.5 bg-brand-main/5 border border-brand-main/20 rounded-xl text-white font-mono text-[11px] placeholder-brand-main/30 focus:border-brand-main/50 focus:ring-1 focus:ring-brand-main/20 transition-all outline-none"
+                        placeholder="ENTER_CLEARANCE_KEY"
+                        required
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="pt-4">

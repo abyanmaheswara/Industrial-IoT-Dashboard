@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useOutletContext } from "react-router-dom";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Filter, Download, FileText, Table as TableIcon, Activity, Thermometer, Zap, Gauge, Database, Droplets } from "lucide-react";
+import { Filter, Download, FileText, Table as TableIcon, Activity, Thermometer, Zap, Gauge, Database, Droplets, Power } from "lucide-react";
 import { socket } from "../socket";
 import type { SensorData } from "../types/sensor";
 import { utils, writeFile } from "xlsx";
@@ -11,11 +11,16 @@ import { unparse } from "papaparse";
 
 export const Analytics = () => {
   const { sensorData } = useOutletContext<{ sensorData: SensorData[] }>();
+  const sensorDataRef = useRef<SensorData[]>([]);
   const [selectedSensor, setSelectedSensor] = useState<string>("dht_temp");
   const [dateRange, setDateRange] = useState<string>("24h");
   const [historyData, setHistoryData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [unitSystem, setUnitSystem] = useState<string>("Celsius");
+
+  useEffect(() => {
+    sensorDataRef.current = sensorData;
+  }, [sensorData]);
 
   useEffect(() => {
     const saved = localStorage.getItem("settings_temp_unit");
@@ -42,10 +47,14 @@ export const Analytics = () => {
       });
       const data = await res.json();
 
+      if (!Array.isArray(data)) {
+        throw new Error(data.error || "Invalid response format");
+      }
+
       // Process data for unit conversion if needed
       const processedData = data.map((d: any) => {
         if (selectedSensor !== "all") {
-          const sensor = sensorData.find((s) => s.id === selectedSensor);
+          const sensor = sensorDataRef.current.find((s) => s.id === selectedSensor);
           if (sensor?.type === "temperature" && unitSystem === "Fahrenheit") {
             return { ...d, value: Number(((d.value * 9) / 5 + 32).toFixed(1)) };
           }
@@ -59,7 +68,7 @@ export const Analytics = () => {
     } finally {
       setLoading(false);
     }
-  }, [selectedSensor, dateRange, unitSystem, sensorData]);
+  }, [selectedSensor, dateRange, unitSystem]);
 
   useEffect(() => {
     fetchData();
@@ -82,8 +91,34 @@ export const Analytics = () => {
     };
 
     socket.on("sensorData", handleRealTimeUpdate);
+
+    // Also listen for direct hardware data (from ESP32 via MQTT)
+    const handleHardwareUpdate = (data: { id: string; value: number; timestamp: string }) => {
+      if (selectedSensor === "all" || data.id !== selectedSensor) return;
+
+      let val = data.value;
+      const sensor = sensorDataRef.current.find((s) => s.id === data.id);
+      if (sensor?.type === "temperature" && unitSystem === "Fahrenheit") {
+        val = Number(((val * 9) / 5 + 32).toFixed(1));
+      }
+
+      setHistoryData((prev) => {
+        const newPoint = {
+          id: data.id,
+          value: val,
+          timestamp: new Date(data.timestamp).getTime() || Date.now(),
+          type: sensor?.type || "unknown",
+          status: sensor?.status || "normal",
+        };
+        return [...prev, newPoint].slice(-100);
+      });
+    };
+
+    socket.on("hardwareSensorData", handleHardwareUpdate);
+
     return () => {
       socket.off("sensorData", handleRealTimeUpdate);
+      socket.off("hardwareSensorData", handleHardwareUpdate);
     };
   }, [selectedSensor, dateRange, unitSystem, fetchData]);
 
@@ -137,6 +172,8 @@ export const Analytics = () => {
         return <Zap className="w-5 h-5 text-brand-main" />;
       case "pressure":
         return <Gauge className="w-5 h-5 text-brand-main" />;
+      case "relay":
+        return <Power className="w-5 h-5 text-brand-main" />;
       default:
         return <Database className="w-5 h-5 text-industrial-500" />;
     }
@@ -222,6 +259,7 @@ export const Analytics = () => {
                   <XAxis dataKey="timestamp" stroke="#473c31" tick={{ fill: "#635445", fontSize: 10, fontWeight: "bold" }} tickFormatter={(t) => new Date(t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} />
                   <YAxis stroke="#473c31" tick={{ fill: "#635445", fontSize: 10, fontWeight: "bold" }} />
                   <Tooltip
+                    labelFormatter={(t) => `🕐 ${new Date(t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`}
                     contentStyle={{
                       backgroundColor: "#0d0b09",
                       border: "1px solid #473c31",

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, X, Save, Activity, Database, AlertCircle } from "lucide-react";
+import { useOutletContext } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { Plus, Edit2, Trash2, X, Save, Activity, Database, AlertCircle, Thermometer, Droplets, Zap, Gauge, Power } from "lucide-react";
 
 interface Sensor {
   id: string;
@@ -11,6 +13,9 @@ interface Sensor {
 }
 
 const SensorManager: React.FC = () => {
+  const { user } = useAuth();
+  const { refreshData } = useOutletContext<{ refreshData: () => Promise<void> }>();
+  const isViewer = user?.role === "viewer";
   const [sensors, setSensors] = useState<Sensor[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -79,6 +84,7 @@ const SensorManager: React.FC = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchSensors();
+      refreshData();
     } catch (err) {
       alert("Failed to delete sensor");
     }
@@ -99,7 +105,7 @@ const SensorManager: React.FC = () => {
           body: JSON.stringify(formData),
         });
       } else {
-        await fetch(`${API_URL}/api/sensors`, {
+        const res = await fetch(`${API_URL}/api/sensors`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -107,11 +113,17 @@ const SensorManager: React.FC = () => {
           },
           body: JSON.stringify(formData),
         });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.error || "Failed to provision sensor");
+        }
       }
       setIsModalOpen(false);
       fetchSensors();
-    } catch (err) {
-      alert("Failed to save sensor");
+      refreshData();
+    } catch (err: any) {
+      alert(err.message);
     }
   };
 
@@ -125,7 +137,11 @@ const SensorManager: React.FC = () => {
           </h3>
           <p className="text-[9px] text-industrial-600 font-mono mt-1 uppercase tracking-widest italic">Inventory_System // Live_Node_Configuration</p>
         </div>
-        <button onClick={() => handleOpenModal()} className="btn-premium px-6 py-3 text-[10px] font-black uppercase tracking-widest flex items-center gap-2 group">
+        <button
+          onClick={() => handleOpenModal()}
+          disabled={isViewer}
+          className={`btn-premium px-6 py-3 text-[10px] font-black uppercase tracking-widest flex items-center gap-2 group ${isViewer ? "opacity-50 cursor-not-allowed filter grayscale" : ""}`}
+        >
           <Plus size={16} className="group-hover:scale-110 transition-transform" />
           Add Peripheral Node
         </button>
@@ -149,7 +165,18 @@ const SensorManager: React.FC = () => {
                 <td className="px-8 py-6 text-[11px] font-mono text-industrial-400 group-hover:text-industrial-200">{sensor.id.toUpperCase()}</td>
                 <td className="px-8 py-6 text-[12px] font-black text-white uppercase tracking-widest">{sensor.name}</td>
                 <td className="px-8 py-6">
-                  <span className="px-2.5 py-1 rounded bg-white/5 text-industrial-500 text-[9px] font-black uppercase tracking-tighter border border-white/5">{sensor.type}</span>
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-white/5 border border-white/5 text-industrial-500">
+                      {sensor.type === "temperature" && <Thermometer size={12} className="text-brand-main" />}
+                      {sensor.type === "humidity" && <Droplets size={12} className="text-brand-main" />}
+                      {sensor.type === "vibration" && <Activity size={12} className="text-brand-main" />}
+                      {sensor.type === "pressure" && <Gauge size={12} className="text-brand-main" />}
+                      {sensor.type === "power" && <Zap size={12} className="text-brand-main" />}
+                      {sensor.type === "relay" && <Power size={12} className="text-brand-main" />}
+                      {!["temperature", "humidity", "vibration", "pressure", "power", "relay"].includes(sensor.type) && <Database size={12} />}
+                    </div>
+                    <span className="px-2.5 py-1 rounded bg-white/5 text-industrial-500 text-[9px] font-black uppercase tracking-tighter border border-white/5">{sensor.type}</span>
+                  </div>
                 </td>
                 <td className="px-8 py-6 text-[11px] font-bold text-industrial-400">{sensor.unit || "UNITS"}</td>
                 <td className="px-8 py-6">
@@ -160,10 +187,20 @@ const SensorManager: React.FC = () => {
                 </td>
                 <td className="px-8 py-6 text-right">
                   <div className="flex justify-end gap-3">
-                    <button onClick={() => handleOpenModal(sensor)} className="p-2.5 bg-brand-main/10 hover:bg-brand-main/20 text-brand-main border border-brand-main/20 rounded-xl transition-all" title="Edit Configuration">
+                    <button
+                      onClick={() => handleOpenModal(sensor)}
+                      disabled={isViewer}
+                      className={`p-2.5 bg-brand-main/10 hover:bg-brand-main/20 text-brand-main border border-brand-main/20 rounded-xl transition-all ${isViewer ? "opacity-30 cursor-not-allowed" : ""}`}
+                      title={isViewer ? "Action disabled in Demo Mode" : "Edit Configuration"}
+                    >
                       <Edit2 size={16} />
                     </button>
-                    <button onClick={() => handleDelete(sensor.id)} className="p-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 rounded-xl transition-all" title="Decommission Node">
+                    <button
+                      onClick={() => handleDelete(sensor.id)}
+                      disabled={isViewer}
+                      className={`p-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 rounded-xl transition-all ${isViewer ? "opacity-30 cursor-not-allowed" : ""}`}
+                      title={isViewer ? "Action disabled in Demo Mode" : "Decommission Node"}
+                    >
                       <Trash2 size={16} />
                     </button>
                   </div>
@@ -184,10 +221,10 @@ const SensorManager: React.FC = () => {
 
       {/* Control Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-xl animate-fadeIn p-4 overflow-hidden">
-          <div className="industrial-grid-premium absolute inset-0 opacity-[0.05] pointer-events-none" />
+        <div className="fixed inset-0 z-[100] flex items-start justify-center bg-black/95 backdrop-blur-xl animate-fadeIn p-4 overflow-y-auto custom-scrollbar">
+          <div className="industrial-grid-premium fixed inset-0 opacity-[0.05] pointer-events-none" />
 
-          <div className="w-full max-w-xl p-8 rounded-2xl shadow-[0_0_80px_rgba(0,0,0,0.9)] border border-white/10 bg-industrial-950/80 card-premium relative">
+          <div className="w-full max-w-xl my-8 p-8 rounded-2xl shadow-[0_0_80px_rgba(0,0,0,0.9)] border border-white/10 bg-industrial-950/80 card-premium relative">
             <div className="flex justify-between items-center mb-8 relative z-10">
               <div>
                 <h3 className="text-[14px] font-black text-white uppercase tracking-[0.4em]">{editingSensor ? "Ammend Node_ID" : "Provision New Node"}</h3>
@@ -239,6 +276,7 @@ const SensorManager: React.FC = () => {
                       <option value="pressure">PRES_VECT</option>
                       <option value="vibration">VIBE_OSC</option>
                       <option value="power">PWR_LOAD</option>
+                      <option value="relay">RELAY_ACT</option>
                       <option value="generic">GEN_NODE</option>
                     </select>
                   </div>

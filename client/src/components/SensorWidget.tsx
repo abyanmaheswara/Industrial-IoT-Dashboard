@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import type { SensorData } from "../types/sensor";
-import { Activity, Thermometer, Zap, Gauge, Droplets, Database } from "lucide-react";
+import { Activity, Thermometer, Zap, Gauge, Droplets, Database, Power } from "lucide-react";
+import { socket } from "../socket";
 
 interface SensorWidgetProps {
   data: SensorData;
@@ -8,6 +9,14 @@ interface SensorWidgetProps {
 
 export const SensorWidget: React.FC<SensorWidgetProps> = ({ data }) => {
   const [unitSystem, setUnitSystem] = useState("Celsius");
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  // Flash on data update
+  useEffect(() => {
+    setIsUpdating(true);
+    const timer = setTimeout(() => setIsUpdating(false), 600);
+    return () => clearTimeout(timer);
+  }, [data.value]);
 
   useEffect(() => {
     const saved = localStorage.getItem("settings_temp_unit");
@@ -39,6 +48,8 @@ export const SensorWidget: React.FC<SensorWidgetProps> = ({ data }) => {
         return <Activity className="w-5 h-5" />;
       case "pressure":
         return <Gauge className="w-5 h-5" />;
+      case "relay":
+        return <Power className="w-5 h-5" />;
       default:
         return <Database className="w-5 h-5" />;
     }
@@ -62,8 +73,22 @@ export const SensorWidget: React.FC<SensorWidgetProps> = ({ data }) => {
     displayUnit = "°F";
   }
 
+  const isRelay = data.type === "relay";
+  const isOn = data.value === 1;
+
+  const handleToggle = () => {
+    const newValue = isOn ? 0 : 1;
+    // Emit command to backend
+    socket.emit("deviceCommand", {
+      deviceId: data.id,
+      value: newValue,
+    });
+  };
+
   return (
-    <div className={`card-premium p-6 group relative h-full flex flex-col justify-between transition-all duration-500 ${isCritical ? "border-red-500/30 bg-red-500/[0.02]" : isWarning ? "border-brand-main/30" : ""}`}>
+    <div
+      className={`card-premium p-6 group relative h-full flex flex-col justify-between transition-all duration-300 ${isCritical ? "border-red-500/30 bg-red-500/[0.02]" : isWarning ? "border-brand-main/30" : ""} ${isUpdating ? "border-sky-500/50 shadow-[0_0_20px_rgba(14,165,233,0.1)]" : ""}`}
+    >
       <div className="scanline-premium opacity-[0.03] rounded-2xl" />
 
       {/* Sensor Header */}
@@ -85,10 +110,31 @@ export const SensorWidget: React.FC<SensorWidgetProps> = ({ data }) => {
 
       {/* Value Display */}
       <div className="relative z-10 mb-6">
-        <div className="flex items-end gap-2">
-          <span className="text-3xl font-black text-white tracking-tighter leading-none group-hover:text-brand-light transition-colors">{typeof displayValue === "number" ? displayValue.toFixed(1) : displayValue}</span>
-          <span className="text-sm font-bold text-industrial-500 uppercase tracking-widest mb-1">{displayUnit}</span>
-        </div>
+        {isRelay ? (
+          <div className="flex flex-col gap-4">
+            <div className="flex items-end gap-2">
+              <span className={`text-3xl font-black tracking-tighter leading-none transition-colors ${isOn ? "text-brand-light" : "text-industrial-600"}`}>{isOn ? "ACTIVE" : "OFFLINE"}</span>
+            </div>
+            <button
+              onClick={handleToggle}
+              className={`w-full py-3 rounded-xl border font-black text-[10px] uppercase tracking-[0.2em] transition-all duration-300 flex items-center justify-center gap-3 ${
+                isOn ? "bg-brand-main text-white border-brand-light shadow-[0_0_20px_rgba(180,83,9,0.3)]" : "bg-industrial-950/40 text-industrial-500 border-white/5 hover:border-white/10"
+              }`}
+            >
+              <Power size={14} className={isOn ? "animate-pulse" : ""} />
+              {isOn ? "Command: SHUTDOWN" : "Command: ACTIVATE"}
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-end gap-2">
+              <span className={`text-3xl font-black tracking-tighter leading-none transition-all duration-300 ${isUpdating ? "text-sky-400 scale-105" : "text-white"} group-hover:text-brand-light`}>
+                {typeof displayValue === "number" ? displayValue.toFixed(1) : displayValue}
+              </span>
+              <span className="text-sm font-bold text-industrial-500 uppercase tracking-widest mb-1">{displayUnit}</span>
+            </div>
+          </>
+        )}
         <p className="text-[10px] font-black text-industrial-600 uppercase tracking-[0.25em] mt-3">{data.name}</p>
       </div>
 
@@ -99,7 +145,7 @@ export const SensorWidget: React.FC<SensorWidgetProps> = ({ data }) => {
             <div className={`w-1.5 h-1.5 rounded-full ${isCritical ? "bg-red-500 pulse-status" : "bg-emerald-500"} opacity-70`} />
             <span className="text-[9px] font-mono font-bold text-industrial-500">{data.id}</span>
           </div>
-          <span className="text-[8px] font-mono text-industrial-700 italic">SYNC_OK</span>
+          <span className={`text-[8px] font-mono italic transition-all duration-300 ${isUpdating ? "text-sky-400 animate-pulse" : "text-industrial-700"}`}>{isUpdating ? "↑ TX" : "SYNC_OK"}</span>
         </div>
 
         <div className="w-full bg-industrial-950 h-1 rounded-full overflow-hidden border border-white/[0.02]">

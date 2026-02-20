@@ -1,6 +1,8 @@
 const aedes = require("aedes")();
 const net = require("net");
 const db = require("./db");
+const jwt = require("jsonwebtoken");
+const SECRET_KEY = process.env.JWT_SECRET;
 
 const startBroker = (io, onDataReceived) => {
   const MQTT_PORT = 1883;
@@ -10,6 +12,53 @@ const startBroker = (io, onDataReceived) => {
     console.log("✅ MQTT Broker started on port", MQTT_PORT);
     console.log("📍 Listening on all interfaces (0.0.0.0)");
   });
+
+  // 1. Authentication (Verify JWT as MQTT Password)
+  aedes.authenticate = (client, username, password, callback) => {
+    if (!password) {
+      console.log(`[MQTT] ⚠️ Missing credentials for client ${client.id}`);
+      return callback(null, false);
+    }
+
+    jwt.verify(password.toString(), SECRET_KEY, (err, decoded) => {
+      if (err) {
+        console.log(`[MQTT] ❌ Auth FAILED for client ${client.id}: ${err.message}`);
+        return callback(null, false);
+      }
+      client.userId = decoded.id; // Store for ACL
+      console.log(`[MQTT] 🔐 Auth SUCCESS for User ${decoded.id} (Client: ${client.id})`);
+      callback(null, true);
+    });
+  };
+
+  // 2. Authorization (ACL - Only allow user to access their own topics)
+  aedes.authorizePublish = (client, packet, callback) => {
+    if (!client) return callback(null); // Internal server messages
+
+    const userId = client.userId;
+    const topic = packet.topic;
+
+    // Rule: Must start with factory/[userId]/
+    if (topic.startsWith(`factory/${userId}/`)) {
+      return callback(null);
+    }
+
+    console.log(`[MQTT] 🚫 ACL BLOCKED: User ${userId} tried to publish to ${topic}`);
+    callback(new Error("Unauthorized topic"));
+  };
+
+  aedes.authorizeSubscribe = (client, subscription, callback) => {
+    const userId = client.userId;
+    const topic = subscription.topic;
+
+    // Rule: Must start with factory/[userId]/
+    if (topic.startsWith(`factory/${userId}/`)) {
+      return callback(null, subscription);
+    }
+
+    console.log(`[MQTT] 🚫 ACL BLOCKED: User ${userId} tried to subscribe to ${topic}`);
+    callback(new Error("Unauthorized subscription"));
+  };
 
   // MQTT Client Connected
   aedes.on("client", (client) => {
@@ -38,40 +87,50 @@ const startBroker = (io, onDataReceived) => {
     console.log(`[MQTT] 📡 Message on ${topic}: ${message}`);
 
     try {
+      // Expected topic: factory/[userId]/sensors/[sensorId]
+      const parts = topic.split("/");
+      if (parts.length < 4 || parts[0] !== "factory") {
+        return console.log("[MQTT] ⚠️ Invalid topic format, skipping.");
+      }
+
+      const userId = parseInt(parts[1]);
+      const sensorId = parts[3];
+
       // Parse JSON payload
       const data = JSON.parse(message);
 
-      if (data.id && data.value !== undefined) {
+      if (data.value !== undefined) {
         const val = parseFloat(data.value);
 
-        // Calculate Status based on basic thresholds (consistent with index.js logic)
-        // Note: In a production app, we'd fetch actual thresholds from the DB
+        // Calculate Status based on basic thresholds
         let status = "normal";
-        if (data.id === "dht_temp") {
+        if (sensorId === "dht_temp") {
           status = val >= 40 ? "critical" : val >= 32 ? "warning" : "normal";
-        } else if (data.id === "dht_humid") {
+        } else if (sensorId === "dht_humid") {
           status = val >= 80 ? "critical" : val >= 70 ? "warning" : "normal";
+        } else if (sensorId === "vibration") {
+          status = val >= 5.0 ? "critical" : val >= 2.5 ? "warning" : "normal";
         }
 
-        // 1. Save to Database with Status
-        await db.saveReading(data.id, val, status);
+        // 1. Save to Database with Status and Owner
+        await db.saveReading(sensorId, val, userId, status);
 
-        // 2. Broadcast to frontend via Socket.io
-        io.emit("hardwareSensorData", {
-          id: data.id,
+        // 2. Broadcast to specific Socket.io user room
+        io.to(`user_${userId}`).emit("hardwareSensorData", {
+          id: sensorId,
           value: val,
           timestamp: new Date().toISOString(),
         });
 
         // 3. Trigger Alert/AI Logic (Callback)
         if (onDataReceived) {
-          onDataReceived(data.id, val);
+          onDataReceived(sensorId, val, userId);
         }
 
-        console.log("[MQTT] ✅ Forwarded to frontend:", data.id, data.value);
+        console.log(`[MQTT] ✅ Forwarded to User ${userId}:`, sensorId, data.value);
       }
     } catch (err) {
-      console.log("[MQTT] ⚠️ Not JSON, skipping:", message);
+      console.log("[MQTT] ⚠️ Parse error:", err.message);
     }
   });
 
@@ -90,4 +149,10 @@ const getClientCount = () => {
   return aedes.connectedClients;
 };
 
-module.exports = { startBroker, getClientCount };
+const publish = (topic, payload) => {
+  aedes.publish({ topic, payload }, (err) => {
+    if (err) console.error("[MQTT] ❌ Publish error:", err.message);
+  });
+};
+
+module.exports = { startBroker, getClientCount, publish };

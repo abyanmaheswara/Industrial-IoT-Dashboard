@@ -134,7 +134,7 @@ export const ProfileSection: React.FC = () => {
     <div className="card-premium p-8 bg-white/[0.01] border-white/5 relative overflow-hidden group">
       <div className="flex flex-col md:flex-row items-center md:items-start gap-10 relative z-10">
         <div className="flex flex-col items-center gap-4">
-          <div className="relative group/avatar cursor-pointer" onClick={triggerFileInput}>
+          <div className={`relative group/avatar ${user?.role === "viewer" ? "cursor-not-allowed" : "cursor-pointer"}`} onClick={user?.role === "viewer" ? undefined : triggerFileInput}>
             <div className="w-28 h-28 rounded-2xl bg-industrial-950 border border-white/10 overflow-hidden flex items-center justify-center transition-all duration-500 group-hover/avatar:border-brand-main/40 shadow-2xl relative">
               {isUploading ? (
                 <Loader className="animate-spin text-brand-main" size={32} />
@@ -143,9 +143,11 @@ export const ProfileSection: React.FC = () => {
               ) : (
                 <div className="text-4xl font-black text-industrial-800 uppercase tracking-tighter">{user?.username?.charAt(0) || "U"}</div>
               )}
-              <div className="absolute inset-0 bg-brand-main/20 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
-                <Camera className="text-white" size={24} />
-              </div>
+              {user?.role !== "viewer" && (
+                <div className="absolute inset-0 bg-brand-main/20 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                  <Camera className="text-white" size={24} />
+                </div>
+              )}
             </div>
             <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} disabled={isUploading} />
           </div>
@@ -170,7 +172,12 @@ export const ProfileSection: React.FC = () => {
               <p className="text-[10px] font-mono text-industrial-500 uppercase tracking-widest">Operator Node Management</p>
             </div>
             {!isEditing ? (
-              <button onClick={() => setIsEditing(true)} className="px-4 py-2 bg-brand-main/10 hover:bg-brand-main/20 border border-brand-main/20 text-brand-main text-[10px] font-black uppercase tracking-widest rounded-xl transition-all">
+              <button
+                onClick={() => setIsEditing(true)}
+                disabled={user?.role === "viewer"}
+                className={`px-4 py-2 bg-brand-main/10 hover:bg-brand-main/20 border border-brand-main/20 text-brand-main text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${user?.role === "viewer" ? "opacity-30 cursor-not-allowed" : ""}`}
+                title={user?.role === "viewer" ? "Disabled in Demo Mode" : ""}
+              >
                 Modify Identity
               </button>
             ) : (

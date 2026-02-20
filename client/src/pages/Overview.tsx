@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import type { SensorData } from "../types/sensor";
 import { SensorWidget } from "../components/SensorWidget";
 import { HealthWidget } from "../components/HealthWidget";
@@ -14,6 +14,24 @@ interface OverviewProps {
 
 export const Overview: React.FC<OverviewProps> = ({ sensorData, powerHistory, alerts = [], mqttStatus }) => {
   const activeAlertsCount = alerts.filter((a) => a.status === "active").length;
+
+  // Build chart history locally from sensorData changes for instant re-render
+  const [localHistory, setLocalHistory] = useState<{ timestamp: number; value: number }[]>([]);
+
+  useEffect(() => {
+    const tempSensor = sensorData.find((s) => s.id === "dht_temp" || s.type === "temperature");
+    if (tempSensor && tempSensor.value !== undefined) {
+      setLocalHistory((prev) => {
+        const last = prev[prev.length - 1];
+        // Avoid exact duplicate points
+        if (last && last.value === tempSensor.value) return prev;
+        return [...prev, { timestamp: Date.now(), value: Number(tempSensor.value) }].slice(-60);
+      });
+    }
+  }, [sensorData]);
+
+  // Use localHistory if it has data, fallback to powerHistory prop
+  const chartData = localHistory.length > 0 ? localHistory : powerHistory;
 
   const avgHealth = useMemo(() => {
     if (sensorData.length === 0) return 100;
@@ -78,10 +96,10 @@ export const Overview: React.FC<OverviewProps> = ({ sensorData, powerHistory, al
               </div>
             </div>
 
-            {powerHistory.length > 0 ? (
+            {chartData.length > 0 ? (
               <div className="w-full h-[400px] -ml-6">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={powerHistory}>
+                  <AreaChart data={chartData}>
                     <defs>
                       <linearGradient id="fluxBronze" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#b45309" stopOpacity={0.4} />

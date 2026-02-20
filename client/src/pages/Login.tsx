@@ -39,6 +39,26 @@ export const Login: React.FC = () => {
     }
   };
 
+  const handleDemoLogin = async () => {
+    setError("");
+    setLoading(true);
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+      const response = await fetch(`${API_URL}/api/auth/demo`, {
+        method: "POST",
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Demo access failed");
+
+      login(data.token, data.user);
+      navigate("/");
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-industrial-950 flex items-center justify-center p-6 relative overflow-hidden custom-scrollbar">
       {/* 1. LAYERED BACKGROUND ENGINE */}
@@ -143,6 +163,15 @@ export const Login: React.FC = () => {
                       </>
                     )}
                   </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleDemoLogin}
+                  disabled={loading}
+                  className="w-full mt-4 py-4 rounded-xl border border-white/5 hover:border-brand-main/30 hover:bg-brand-main/5 text-industrial-500 hover:text-brand-light transition-all flex items-center justify-center gap-3 group/demo"
+                >
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em]">Request_Public_Demo</span>
                 </button>
               </div>
             </form>

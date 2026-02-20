@@ -25,6 +25,11 @@ export const Alerts: React.FC = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
+
+      if (!Array.isArray(data)) {
+        throw new Error(data.error || "Invalid response format");
+      }
+
       setAlerts(data);
 
       // Calculate stats

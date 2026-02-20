@@ -11,8 +11,20 @@ const char* ssid = "OPPO Reno8";
 const char* password = "12345678";        
 
 // --- PROTOCOL CONFIGURATION (MQTT) ---
+// --- PROTOCOL CONFIGURATION (MQTT) ---
 const char* mqtt_server = "10.158.49.141"; 
 const int mqtt_port = 1883;
+
+// --- SECURITY PROTOCOL (CREDENTIALS) ---
+// [IMPORTANT] User ID abang adalah 3 (diliat dari isi token tadi)
+const char* mqtt_user = "3"; 
+
+// [IMPORTANT]
+const char* mqtt_pass = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJhYnlhbiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3MTU5NzUyMSwiZXhwIjoxNzcxNjgzOTIxfQ.bumZyq14JCbbL6-E93q9yFB8BKPCINkBAQwStN6ePDg";  
+
+// --- TOPICS (AUTOMATIC ISOLATION) ---
+const String base_topic = "factory/" + String(mqtt_user) + "/sensors/";
+const String cmd_topic = "factory/" + String(mqtt_user) + "/commands/#";
 
 // --- HARDWARE MATRIX ---
 #define DHTPIN 4      // DHT22 data pin to D4
@@ -51,24 +63,47 @@ void setup_wifi() {
   Serial.println(WiFi.localIP());
 }
 
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("\n[COMMAND] Incoming Signal on: ");
+  Serial.println(topic);
+  
+  String msg;
+  for (int i = 0; i < length; i++) msg += (char)payload[i];
+  Serial.print("[DATA] Payload: ");
+  Serial.println(msg);
+
+  // Example: Handle relay toggle if command is for this device
+  if (String(topic).indexOf("relay_main") > 0) {
+    if (msg.indexOf("\"value\": 1") > 0) {
+      Serial.println("[ACTUATOR] RELAY: ON");
+      digitalWrite(STATUS_LED, LOW); // Logic depends on your relay wiring
+    } else {
+      Serial.println("[ACTUATOR] RELAY: OFF");
+      digitalWrite(STATUS_LED, HIGH);
+    }
+  }
+}
+
 void reconnect() {
   while (!client.connected()) {
-    Serial.print("[SIGNAL] Attempting Protocol Handshake...");
+    Serial.print("[SIGNAL] Attempting Protocol Handshake (JWT)...");
     
     String mac = WiFi.macAddress();
     mac.replace(":", "");
     String clientId = "FF_NODE_" + mac.substring(8); 
     
-    client.setKeepAlive(60); 
-    
-    if (client.connect(clientId.c_str())) {
+    // Connect syntax: client.connect(id, user, pass)
+    if (client.connect(clientId.c_str(), mqtt_user, mqtt_pass)) {
       Serial.println("CONNECTED ✅");
-      Serial.printf("[INFO] Client ID: %s\n", clientId.c_str());
-      Serial.println("[INFO] Telemetry Stream: ONLINE");
+      Serial.printf("[INFO] Passport: User %s Secured\n", mqtt_user);
+      
+      // Subscribe to commands for this specific user
+      client.subscribe(cmd_topic.c_str());
+      Serial.println("[INFO] Control Channel: LINKED");
     } else {
-      Serial.print("FAILED [rc=");
+      Serial.print("AUTH FAILED [rc=");
       Serial.print(client.state());
-      Serial.println("] - Retrying in 5s");
+      Serial.println("] - Check JWT Token & User ID");
       delay(5000);
     }
   }
@@ -80,16 +115,17 @@ void setup() {
   
   Serial.println("\n\n#########################################");
   Serial.println("#      FACTORY FORGE - INDUSTRIAL OS    #");
-  Serial.println("#      Hardware Node: ESP32_EDGE_01     #");
-  Serial.println("#      Firmware Version: 1.0.0          #");
+  Serial.println("#      Security Node: JWT_SECURED_01    #");
+  Serial.println("#      Version: v2.1 (Pure Hardware)    #");
   Serial.println("#########################################\n");
 
   dht.begin();
   setup_wifi();
   client.setServer(mqtt_server, mqtt_port);
+  client.setCallback(callback);
   
   Serial.println("[INIT] System initialization complete");
-  Serial.println("[READY] Entering telemetry loop...\n");
+  Serial.println("[READY] Listening for Command Uplinks...\n");
 }
 
 void loop() {
@@ -106,29 +142,27 @@ void loop() {
     float t = dht.readTemperature();
 
     if (isnan(h) || isnan(t)) {
-      Serial.println("[ERROR] DHT22 read failure - Check wiring!");
+      Serial.println("[ERROR] DHT22 sensor offline");
       return;
     }
 
-    // --- SEND TEMPERATURE ---
-    String payloadTemp = "{\"id\": \"dht_temp\", \"value\": " + String(t, 2) + "}";
-    if (client.publish("sensors/dht_temp", payloadTemp.c_str())) {
-      Serial.printf("[TX] Temperature: %.2f °C\n", t);
-    } else {
-      Serial.println("[ERROR] Failed to publish temperature");
+    // --- PACKET: TEMPERATURE ---
+    String topT = base_topic + "dht_temp";
+    String payT = "{\"value\": " + String(t, 2) + "}";
+    if (client.publish(topT.c_str(), payT.c_str())) {
+      Serial.printf("[TX] %s -> %.2f\n", topT.c_str(), t);
     }
     
-    // --- SEND HUMIDITY ---
-    String payloadHumid = "{\"id\": \"dht_humid\", \"value\": " + String(h, 2) + "}";
-    if (client.publish("sensors/dht_humid", payloadHumid.c_str())) {
-      Serial.printf("[TX] Humidity: %.2f %%\n", h);
-    } else {
-      Serial.println("[ERROR] Failed to publish humidity");
+    // --- PACKET: HUMIDITY ---
+    String topH = base_topic + "dht_humid";
+    String payH = "{\"value\": " + String(h, 2) + "}";
+    if (client.publish(topH.c_str(), payH.c_str())) {
+      Serial.printf("[TX] %s -> %.2f\n", topH.c_str(), h);
     }
 
-    // Blink LED on transmission
+    // Status Pulse
     digitalWrite(STATUS_LED, LOW);
-    delay(50);
+    delay(30);
     digitalWrite(STATUS_LED, HIGH);
   }
 }

@@ -1,6 +1,7 @@
 -- Sensors Table
 CREATE TABLE IF NOT EXISTS sensors (
   id VARCHAR(50) PRIMARY KEY,
+  owner_id INT REFERENCES users(id),
   name VARCHAR(100),
   type VARCHAR(50),
   unit VARCHAR(20),
@@ -12,6 +13,7 @@ CREATE TABLE IF NOT EXISTS sensors (
 CREATE TABLE IF NOT EXISTS readings (
   id SERIAL PRIMARY KEY,
   sensor_id VARCHAR(50) REFERENCES sensors(id),
+  owner_id INT REFERENCES users(id),
   value DECIMAL,
   status VARCHAR(20), -- 'normal', 'warning', 'critical'
   timestamp TIMESTAMPTZ DEFAULT NOW()
@@ -21,6 +23,7 @@ CREATE TABLE IF NOT EXISTS readings (
 CREATE TABLE IF NOT EXISTS alerts (
   id SERIAL PRIMARY KEY,
   sensor_id VARCHAR(50) REFERENCES sensors(id),
+  owner_id INT REFERENCES users(id),
   type VARCHAR(20), -- 'warning', 'critical'
   message TEXT,
   status VARCHAR(20) DEFAULT 'active', -- 'active', 'acknowledged', 'resolved'

@@ -1,4 +1,4 @@
-export type SensorType = "temperature" | "pressure" | "vibration" | "power" | "humidity";
+export type SensorType = "temperature" | "pressure" | "vibration" | "power" | "humidity" | "relay";
 export type SensorStatus = "normal" | "warning" | "critical";
 
 export interface SensorData {

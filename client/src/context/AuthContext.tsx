@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { socket } from "../socket";
 
 interface User {
   id: number;
@@ -31,6 +32,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (storedToken && storedUser) {
       setToken(storedToken);
       setUser(JSON.parse(storedUser));
+
+      // Auto-connect and authenticate socket
+      if (!socket.connected) {
+        socket.connect();
+        socket.emit("authenticate", storedToken);
+      }
     }
   }, []);
 
@@ -39,6 +46,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem("user", JSON.stringify(newUser));
     setToken(newToken);
     setUser(newUser);
+
+    // Dynamic socket authentication
+    if (!socket.connected) socket.connect();
+    socket.emit("authenticate", newToken);
   };
 
   const logout = () => {
@@ -46,6 +57,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem("user");
     setToken(null);
     setUser(null);
+    socket.disconnect();
   };
 
   const updateUser = (updatedUser: User) => {

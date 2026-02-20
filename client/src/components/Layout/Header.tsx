@@ -99,6 +99,7 @@ export function Header({ mqttStatus }: { mqttStatus?: { connected: boolean; clie
           <div className="flex items-center gap-2 mb-1">
             <div className="w-1.5 h-1.5 rounded-full bg-brand-main pulse-status" />
             <span className="text-[12px] font-black text-white tracking-[0.3em] uppercase font-mono">{currentTime.toLocaleTimeString("en-US", { hour12: false })}</span>
+            {user?.role === "viewer" && <span className="ml-4 px-2 py-0.5 bg-brand-main/10 border border-brand-main/30 text-brand-main text-[8px] font-black uppercase tracking-[0.2em] animate-pulse">Demo_Access_Active</span>}
           </div>
           <span className="text-[9px] text-industrial-500 font-bold uppercase tracking-[0.2em]">Sector_07 // Operational Sync</span>
         </div>
@@ -131,7 +132,7 @@ export function Header({ mqttStatus }: { mqttStatus?: { connected: boolean; clie
           </button>
 
           {showDropdown && (
-            <div className="absolute right-0 mt-6 w-96 card-premium z-50 animate-in fade-in slide-in-from-top-4 duration-500">
+            <div className="absolute right-0 mt-6 w-96 bg-industrial-950/95 backdrop-blur-3xl border border-white/10 rounded-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-4 duration-500 shadow-[0_30px_100px_rgba(0,0,0,0.95)]">
               <div className="h-1.5 w-full bg-gradient-to-r from-transparent via-brand-main to-transparent opacity-50" />
 
               <div className="p-5 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
@@ -210,13 +211,13 @@ export function Header({ mqttStatus }: { mqttStatus?: { connected: boolean; clie
 
             <div className="hidden md:block text-left">
               <div className="text-[11px] font-black text-white uppercase tracking-[0.2em] mb-1 group-hover:text-brand-light transition-colors">{user?.full_name || user?.username || "OP_CORE_B"}</div>
-              <div className="text-[9px] text-industrial-500 font-mono font-bold uppercase tracking-tighter italic">Lvl 3 Authentication 🔐</div>
+              <div className="text-[9px] text-industrial-500 font-mono font-bold uppercase tracking-tighter italic">{user?.role === "viewer" ? "Public Guest Access 🌐" : "Lvl 3 Authentication 🔐"}</div>
             </div>
             <ChevronDown size={14} className={`text-industrial-600 transition-all duration-500 ${showProfileDropdown ? "rotate-180 text-brand-main" : "group-hover:text-industrial-400"}`} />
           </button>
 
           {showProfileDropdown && (
-            <div className="absolute right-0 mt-6 w-64 card-premium z-50 animate-in fade-in zoom-in-95 duration-300 origin-top-right">
+            <div className="absolute right-0 mt-6 w-64 bg-industrial-950/95 backdrop-blur-3xl border border-white/10 rounded-2xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-300 origin-top-right shadow-[0_30px_100px_rgba(0,0,0,0.95)]">
               <div className="p-6 border-b border-white/5 bg-white/[0.01]">
                 <p className="text-[10px] font-black text-brand-main uppercase tracking-[0.35em] mb-1.5">Operational Node</p>
                 <p className="text-[13px] font-black text-white truncate">{user?.full_name || user?.username || "Guest Identity"}</p>

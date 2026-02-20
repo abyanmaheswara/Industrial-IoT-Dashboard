@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { BrowserRouter as Router, Routes, Route, Outlet, useOutletContext } from "react-router-dom";
 import { socket } from "./socket";
 import type { SensorData } from "./types/sensor";
@@ -28,86 +28,84 @@ const DashboardData = () => {
 
   // Use a ref for the latest sensor data to avoid closure issues in socket handlers
   const sensorDataRef = useRef<SensorData[]>([]);
-  const lastUpdateRef = useRef<number>(0);
-  const refreshIntervalRef = useRef<number>(2000);
 
   useEffect(() => {
     sensorDataRef.current = sensorData;
   }, [sensorData]);
 
-  useEffect(() => {
-    const saved = localStorage.getItem("settings_refresh_interval");
-    if (saved) {
-      refreshIntervalRef.current = parseInt(saved) * 1000;
-    }
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
-    const handleSettingsChange = (e: Event) => {
-      const customEvent = e as CustomEvent;
-      if (customEvent.detail && customEvent.detail.refreshInterval) {
-        refreshIntervalRef.current = parseInt(customEvent.detail.refreshInterval) * 1000;
+  const fetchData = useCallback(async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const sensorsRes = await fetch(`${API_URL}/api/sensors`, { headers: { Authorization: `Bearer ${token}` } });
+      const alertsRes = await fetch(`${API_URL}/api/alerts`, { headers: { Authorization: `Bearer ${token}` } });
+      const mqttRes = await fetch(`${API_URL}/api/mqtt/status`, { headers: { Authorization: `Bearer ${token}` } });
+
+      const initialSensors = await sensorsRes.json();
+      const initialAlerts = await alertsRes.json();
+      const initialMqtt = await mqttRes.json();
+
+      if (mqttRes.ok) setMqttStatus(initialMqtt);
+
+      if (Array.isArray(initialSensors)) {
+        setSensorData(
+          initialSensors.map((s: any) => ({
+            ...s,
+            value: s.value !== undefined ? parseFloat(s.value) : 0,
+            timestamp: Date.now(),
+          })),
+        );
+      }
+
+      if (Array.isArray(initialAlerts)) {
+        setAlerts(initialAlerts.slice(0, 10));
+      }
+    } catch (err) {
+      console.error("Critical: Initial data sync failed", err);
+    }
+  }, [API_URL]);
+
+  useEffect(() => {
+    fetchData();
+
+    // Authenticate to join user's private socket room
+    // IMPORTANT: Must happen AFTER connection is established
+    const onConnect = () => {
+      const t = localStorage.getItem("token");
+      if (t) {
+        socket.emit("authenticate", t);
+        console.log("[Socket] 🔑 Sent authenticate token to join user room");
       }
     };
 
-    window.addEventListener("settingsChanged", handleSettingsChange);
-    return () => window.removeEventListener("settingsChanged", handleSettingsChange);
-  }, []);
+    socket.on("connect", onConnect);
 
-  useEffect(() => {
-    if (!socket.connected) {
+    // If already connected, authenticate immediately
+    if (socket.connected) {
+      onConnect();
+    } else {
       socket.connect();
     }
 
-    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
-    const token = localStorage.getItem("token");
-
-    // Initial Fetch
-    const fetchData = async () => {
-      try {
-        const [sensorsRes, alertsRes, mqttRes] = await Promise.all([
-          fetch(`${API_URL}/api/sensors`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${API_URL}/api/alerts`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${API_URL}/api/mqtt/status`, { headers: { Authorization: `Bearer ${token}` } }),
-        ]);
-
-        const initialSensors = await sensorsRes.json();
-        const initialAlerts = await alertsRes.json();
-        const initialMqtt = await mqttRes.json();
-
-        if (mqttRes.ok) setMqttStatus(initialMqtt);
-
-        if (Array.isArray(initialSensors)) {
-          setSensorData(
-            initialSensors.map((s) => ({
-              ...s,
-              value: s.value || 0,
-              timestamp: Date.now(),
-            })),
-          );
-        }
-
-        if (Array.isArray(initialAlerts)) {
-          setAlerts(initialAlerts.slice(0, 10));
-        }
-      } catch (err) {
-        console.error("Critical: Initial data sync failed", err);
-      }
-    };
-
-    fetchData();
-
     const onSensorData = (data: SensorData[]) => {
-      const now = Date.now();
-      if (now - lastUpdateRef.current >= refreshIntervalRef.current) {
-        setSensorData(data);
-        lastUpdateRef.current = now;
+      const sanitizedData = Array.isArray(data)
+        ? data.map((s) => ({
+            ...s,
+            value: s.value !== undefined ? parseFloat(s.value as any) : 0,
+          }))
+        : [];
+      setSensorData(sanitizedData);
 
-        const mainSensor = data.find((s) => s.id === "dht_temp");
-        if (mainSensor) {
-          setPowerHistory((prev) => {
-            const newHistory = [...prev, { ...mainSensor, timestamp: now }];
-            return newHistory.slice(-50);
-          });
-        }
+      const mainSensor = data.find((s) => s.id === "dht_temp");
+      if (mainSensor) {
+        const now = Date.now();
+        setPowerHistory((prev) => {
+          const newHistory = [...prev, { ...mainSensor, timestamp: now }];
+          return newHistory.slice(-50);
+        });
       }
     };
 
@@ -121,27 +119,16 @@ const DashboardData = () => {
       setMqttStatus(status);
     };
 
-    const lastUpdateRef = { current: 0 };
-
     const onHardwareData = (data: { id: string; value: number; timestamp: string }) => {
-      const now = Date.now();
-      const intervalMs = parseInt(refreshIntervalRef.current) * 1000;
-
-      // Throttle: only update state if interval has passed
-      if (now - lastUpdateRef.current < intervalMs && lastUpdateRef.current !== 0) {
-        return;
-      }
-
-      lastUpdateRef.current = now;
-
       setSensorData((prev) => {
         const index = prev.findIndex((s) => s.id === data.id);
         if (index === -1) return prev;
         const newArr = [...prev];
+        const val = data.value !== undefined ? parseFloat(data.value as any) : 0;
         newArr[index] = {
           ...newArr[index],
-          value: data.value,
-          timestamp: new Date(data.timestamp).getTime(),
+          value: isNaN(val) ? 0 : val,
+          timestamp: new Date(data.timestamp).getTime() || Date.now(),
         };
         return newArr;
       });
@@ -169,16 +156,17 @@ const DashboardData = () => {
     socket.on("hardwareSensorData", onHardwareData);
 
     return () => {
+      socket.off("connect", onConnect);
       socket.off("sensorData", onSensorData);
       socket.off("newAlert", onNewAlert);
       socket.off("mqttStatus", onMqttStatus);
       socket.off("hardwareSensorData", onHardwareData);
     };
-  }, []);
+  }, [fetchData]);
 
   return (
     <MainLayout mqttStatus={mqttStatus}>
-      <Outlet context={{ sensorData, powerHistory, alerts, mqttStatus }} />
+      <Outlet context={{ sensorData, powerHistory, alerts, mqttStatus, refreshData: fetchData }} />
       <NotificationSystem />
     </MainLayout>
   );

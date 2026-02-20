@@ -18,47 +18,46 @@ const query = (text, params) =>
   });
 
 // Ensure sensor exists
-const ensureSensor = async (sensor) => {
-  const check = await query("SELECT id FROM sensors WHERE id = $1", [sensor.id]);
+const ensureSensor = async (sensor, ownerId) => {
+  // Check if ID exists for this owner specifically
+  const check = await query("SELECT id FROM sensors WHERE id = $1 AND owner_id = $2", [sensor.id, ownerId]);
   if (check.rowCount === 0) {
-    await query("INSERT INTO sensors (id, name, type, unit, threshold) VALUES ($1, $2, $3, $4, $5)", [sensor.id, sensor.name, sensor.type, sensor.unit, sensor.threshold]);
+    await query("INSERT INTO sensors (id, owner_id, name, type, unit, threshold) VALUES ($1, $2, $3, $4, $5, $6)", [sensor.id, ownerId, sensor.name, sensor.type, sensor.unit, sensor.threshold]);
   }
 };
 
 // Save reading
-const saveReading = async (sensorId, value, status = "normal") => {
+const saveReading = async (sensorId, value, ownerId, status = "normal") => {
   try {
-    await query("INSERT INTO readings (sensor_id, value, status) VALUES ($1, $2, $3)", [sensorId, value, status]);
+    await query("INSERT INTO readings (sensor_id, value, owner_id, status) VALUES ($1, $2, $3, $4)", [sensorId, value, ownerId, status]);
   } catch (err) {
     console.error("Error saving reading:", err.message);
   }
 };
 
 // Get history
-const getHistory = async (sensorId, limit = 50) => {
-  const res = await query("SELECT * FROM readings WHERE sensor_id = $1 ORDER BY timestamp DESC LIMIT $2", [sensorId, limit]);
+const getHistory = async (sensorId, ownerId, limit = 50) => {
+  const res = await query("SELECT * FROM readings WHERE sensor_id = $1 AND owner_id = $2 ORDER BY timestamp DESC LIMIT $3", [sensorId, ownerId, limit]);
   return res.rows.reverse(); // Return oldest to newest for charts
 };
 
 // Create Alert
-const createAlert = async (sensorId, type, message) => {
+const createAlert = async (sensorId, ownerId, type, message) => {
   try {
-    // Prevent duplicate active alerts for same sensor/type to avoid spam
-    const check = await query("SELECT id FROM alerts WHERE sensor_id = $1 AND type = $2 AND status = 'active'", [sensorId, type]);
+    // Prevent duplicate active alerts for same sensor/type/owner
+    const check = await query("SELECT id FROM alerts WHERE sensor_id = $1 AND owner_id = $2 AND type = $3 AND status = 'active'", [sensorId, ownerId, type]);
 
     if (check.rowCount === 0) {
-      console.log(`[DEBUG] Inserting alert for ${sensorId}...`);
-      const res = await query("INSERT INTO alerts (sensor_id, type, message, status) VALUES ($1, $2, $3, 'active') RETURNING *", [sensorId, type, message]);
-      console.log(`[ALERT] New ${type} alert for ${sensorId}: ${message}`);
+      console.log(`[DEBUG] Inserting alert for ${sensorId} (User: ${ownerId})...`);
+      const res = await query("INSERT INTO alerts (sensor_id, owner_id, type, message, status) VALUES ($1, $2, $3, $4, 'active') RETURNING *", [sensorId, ownerId, type, message]);
 
       // Fetch sensor name for UI convenience
-      const sensorRes = await query("SELECT name FROM sensors WHERE id = $1", [sensorId]);
+      const sensorRes = await query("SELECT name FROM sensors WHERE id = $1 AND owner_id = $2", [sensorId, ownerId]);
       const alert = res.rows[0];
       alert.sensor_name = sensorRes.rows[0]?.name || sensorId;
 
       return alert;
     } else {
-      // console.log(`[DEBUG] Alert already active for ${sensorId}`);
       return null;
     }
   } catch (err) {
@@ -68,14 +67,15 @@ const createAlert = async (sensorId, type, message) => {
 };
 
 // Get Alerts
-const getAlerts = async (limit = 20) => {
+const getAlerts = async (ownerId, limit = 20) => {
   const res = await query(
     `SELECT a.*, s.name as sensor_name 
          FROM alerts a 
-         JOIN sensors s ON a.sensor_id = s.id 
+         JOIN sensors s ON a.sensor_id = s.id AND a.owner_id = s.owner_id
+         WHERE a.owner_id = $1
          ORDER BY a.created_at DESC 
-         LIMIT $1`,
-    [limit],
+         LIMIT $2`,
+    [ownerId, limit],
   );
   return res.rows;
 };
@@ -93,11 +93,11 @@ const updateAlertStatus = async (id, status) => {
 };
 
 // Autocheck and resolve alerts if sensor is back to normal
-const autoResolveAlerts = async (sensorId) => {
+const autoResolveAlerts = async (sensorId, ownerId) => {
   try {
-    const res = await query("UPDATE alerts SET status = 'resolved', resolved_at = NOW() WHERE sensor_id = $1 AND status = 'active' RETURNING *", [sensorId]);
+    const res = await query("UPDATE alerts SET status = 'resolved', resolved_at = NOW() WHERE sensor_id = $1 AND owner_id = $2 AND status = 'active' RETURNING *", [sensorId, ownerId]);
     if (res.rowCount > 0) {
-      console.log(`[ALERT] Auto-resolved ${res.rowCount} alert(s) for ${sensorId} (Status Normal)`);
+      console.log(`[ALERT] Auto-resolved ${res.rowCount} alert(s) for ${sensorId} / User ${ownerId} (Status Normal)`);
       return res.rows;
     }
     return null;
@@ -137,9 +137,22 @@ const updateUserProfile = async (id, fullName, email) => {
 };
 
 // Get All Sensors
-const getSensors = async () => {
-  const res = await query("SELECT * FROM sensors ORDER BY id ASC");
+const getSensors = async (ownerId) => {
+  const res = await query("SELECT * FROM sensors WHERE owner_id = $1 ORDER BY id ASC", [ownerId]);
   return res.rows;
+};
+
+// Update Sensor
+const updateSensor = async (id, ownerId, data) => {
+  const text = "UPDATE sensors SET name = $1, threshold = $2, unit = $3 WHERE id = $4 AND owner_id = $5";
+  await query(text, [data.name, data.threshold, data.unit, id, ownerId]);
+};
+
+// Delete Sensor
+const deleteSensor = async (id, ownerId) => {
+  await query("DELETE FROM alerts WHERE sensor_id = $1 AND owner_id = $2", [id, ownerId]);
+  await query("DELETE FROM readings WHERE sensor_id = $1 AND owner_id = $2", [id, ownerId]);
+  await query("DELETE FROM sensors WHERE id = $1 AND owner_id = $2", [id, ownerId]);
 };
 
 module.exports = {
@@ -154,6 +167,8 @@ module.exports = {
   findUserByUsername,
   findUserById,
   updateUserProfile,
-  autoResolveAlerts, // Export new function
+  autoResolveAlerts,
   getSensors,
+  updateSensor,
+  deleteSensor,
 };

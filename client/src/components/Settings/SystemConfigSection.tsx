@@ -1,6 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
-import { ChevronDown, Sliders, Timer, Thermometer } from "lucide-react";
+import { ChevronDown, Sliders, Timer, Thermometer, Power, Activity } from "lucide-react";
+import { useOutletContext } from "react-router-dom";
+import type { SensorData } from "../../types/sensor";
+import { socket } from "../../socket";
 
 interface DropdownProps {
   value: string;
@@ -66,7 +69,7 @@ const Dropdown: React.FC<DropdownProps> = ({ value, onChange, options }) => {
       {isOpen &&
         createPortal(
           <div
-            className="absolute bg-industrial-950 border border-white/10 rounded-xl shadow-[0_0_50px_rgba(0,0,0,0.9)] z-[99999] overflow-hidden backdrop-blur-2xl"
+            className="absolute bg-industrial-950/95 border border-white/10 rounded-xl shadow-[0_20px_80px_rgba(0,0,0,0.95)] z-[99999] overflow-hidden backdrop-blur-3xl"
             style={{
               top: coords.top + 8,
               ...(coords.align === "left" ? { left: coords.left } : { right: coords.right }),
@@ -78,7 +81,8 @@ const Dropdown: React.FC<DropdownProps> = ({ value, onChange, options }) => {
             {options.map((option) => (
               <div
                 key={option.value}
-                onClick={(e) => {
+                onMouseDown={(e) => {
+                  e.preventDefault();
                   e.stopPropagation();
                   onChange(option.value);
                   setIsOpen(false);
@@ -98,6 +102,7 @@ const Dropdown: React.FC<DropdownProps> = ({ value, onChange, options }) => {
 };
 
 export const SystemConfigSection: React.FC = () => {
+  const { sensorData } = useOutletContext<{ sensorData: SensorData[] }>();
   const [refreshInterval, setRefreshInterval] = useState("10");
   const [tempUnit, setTempUnit] = useState("Celsius");
 
@@ -157,11 +162,53 @@ export const SystemConfigSection: React.FC = () => {
           />
           <p className="text-[8px] text-industrial-700 font-mono mt-3 uppercase tracking-widest italic leading-relaxed">Conversion engine: Affects all thermal telemetry displays and threshold calculations.</p>
         </div>
+
+        {/* Live Operational Hub */}
+        <div className="pt-6 border-t border-white/5 space-y-4">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <Activity size={14} className="text-emerald-500" />
+              <label className="text-[10px] font-black text-industrial-400 uppercase tracking-widest">Active Node Matrix</label>
+            </div>
+            <span className="text-[9px] font-mono text-emerald-500/50 animate-pulse">LIVE_SYNC</span>
+          </div>
+
+          <div className="space-y-2">
+            {sensorData.slice(0, 5).map((sensor) => (
+              <div key={sensor.id} className="flex items-center justify-between px-5 py-4 rounded-xl border bg-industrial-950/60 border-white/5 hover:border-brand-main/20 transition-all shadow-inner group/row">
+                <div className="flex items-center gap-4">
+                  <div className={`w-1.5 h-1.5 rounded-full ${sensor.status === "critical" ? "bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.5)]" : "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"}`} />
+                  <span className="text-[10px] font-black text-white uppercase tracking-widest group-hover/row:text-brand-light transition-colors">{sensor.name}</span>
+                </div>
+                <div className="flex items-center gap-5">
+                  <span className="text-[10px] font-mono text-brand-main font-bold tracking-tight">{sensor.type === "relay" ? (sensor.value === 1 ? "STATUS: ACTIVE" : "STATUS: OFFLINE") : `${sensor.value} ${sensor.unit}`}</span>
+                  {sensor.type === "relay" && (
+                    <button
+                      onClick={() => socket.emit("deviceCommand", { deviceId: sensor.id, value: sensor.value === 1 ? 0 : 1 })}
+                      className={`p-2 rounded-lg border transition-all ${
+                        sensor.value === 1
+                          ? "bg-brand-main/20 border-brand-main/40 text-brand-light shadow-[0_0_15px_rgba(180,83,9,0.2)]"
+                          : "bg-white/[0.03] border-white/10 text-industrial-500 hover:border-brand-main/40 hover:text-brand-main"
+                      }`}
+                      title={sensor.value === 1 ? "Shutdown Command" : "Activate Command"}
+                    >
+                      <Power size={12} className={sensor.value === 1 ? "animate-pulse" : ""} />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+            {sensorData.length === 0 && <p className="text-[9px] text-industrial-700 italic uppercase">Initializing hardware discovery chain...</p>}
+          </div>
+        </div>
       </div>
 
-      <div className="mt-10 pt-6 border-t border-white/5 flex items-center gap-3 opacity-30">
-        <Sliders size={12} className="text-brand-main" />
-        <span className="text-[9px] font-black uppercase tracking-widest">Config_Engine_Locked</span>
+      <div className="mt-10 pt-6 border-t border-white/5 flex items-center justify-between opacity-30">
+        <div className="flex items-center gap-3">
+          <Sliders size={12} className="text-brand-main" />
+          <span className="text-[9px] font-black uppercase tracking-widest">Config_Engine_V2.1</span>
+        </div>
+        <span className="text-[8px] font-mono">HASH_{Math.random().toString(36).substring(7).toUpperCase()}</span>
       </div>
     </div>
   );
