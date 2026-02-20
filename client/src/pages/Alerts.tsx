@@ -5,6 +5,7 @@ import { AlertFilters } from "../components/Alerts/AlertFilters";
 import { AlertTable } from "../components/Alerts/AlertTable";
 import { socket } from "../socket";
 import { RuleConfigModal } from "../components/Alerts/RuleConfigModal";
+import { API_URL } from "../config";
 
 export const Alerts: React.FC = () => {
   const [alerts, setAlerts] = React.useState<any[]>([]);
@@ -19,7 +20,6 @@ export const Alerts: React.FC = () => {
 
   const fetchAlerts = React.useCallback(async () => {
     try {
-      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
       const token = localStorage.getItem("token");
       const res = await fetch(`${API_URL}/api/alerts`, {
         headers: { Authorization: `Bearer ${token}` },
