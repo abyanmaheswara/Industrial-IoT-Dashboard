@@ -2,9 +2,12 @@ const aedes = require("aedes")();
 const net = require("net");
 const db = require("./db");
 const jwt = require("jsonwebtoken");
-const SECRET_KEY = process.env.JWT_SECRET;
+const SECRET_KEY = process.env.JWT_SECRET || "factory_forge_2026_default_secret";
 
-const startBroker = (io, onDataReceived) => {
+// Track connection attempts for debugging
+aedes.on("connackSent", (client) => {
+  if (client) console.log(`[MQTT] 📤 CONNACK sent to ${client.id}`);
+});
   const MQTT_PORT = 1883;
   const mqttServer = net.createServer(aedes.handle);
 
@@ -15,6 +18,8 @@ const startBroker = (io, onDataReceived) => {
 
   // 1. Authentication (Verify JWT as MQTT Password)
   aedes.authenticate = (client, username, password, callback) => {
+    console.log(`[MQTT] 🔑 Auth attempt from client: ${client.id}`);
+    
     if (!password) {
       console.log(`[MQTT] ⚠️ Missing credentials for client ${client.id}`);
       return callback(null, false);
