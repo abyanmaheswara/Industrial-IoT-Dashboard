@@ -14,7 +14,8 @@ if (process.env.DATABASE_URL) {
 const pool = process.env.DATABASE_URL
   ? new Pool({
       connectionString: process.env.DATABASE_URL,
-      ssl: isProduction ? { rejectUnauthorized: false } : false,
+      // Force SSL for Supabase even if NODE_ENV is not set to production
+      ssl: process.env.DATABASE_URL.includes("supabase.co") ? { rejectUnauthorized: false } : isProduction ? { rejectUnauthorized: false } : false,
     })
   : new Pool({
       user: process.env.DB_USER,
@@ -86,7 +87,7 @@ const getAlerts = async (ownerId, limit = 20) => {
   const res = await query(
     `SELECT a.*, s.name as sensor_name 
          FROM alerts a 
-         JOIN sensors s ON a.sensor_id = s.id AND a.owner_id = s.owner_id
+         LEFT JOIN sensors s ON a.sensor_id = s.id AND a.owner_id = s.owner_id
          WHERE a.owner_id = $1
          ORDER BY a.created_at DESC 
          LIMIT $2`,
