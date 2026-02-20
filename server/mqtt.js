@@ -14,15 +14,16 @@ const startBroker = (io, onDataReceived) => {
   // MQTT Client Connected
   aedes.on("client", (client) => {
     console.log("[MQTT] ✅ Client CONNECTED:", client.id);
-    // Count current clients - simple implementation
-    const clientCount = Object.keys(aedes.clients).length;
+    const clientCount = aedes.connectedClients;
+    console.log("[MQTT] 👥 Total clients:", clientCount);
     io.emit("mqttStatus", { connected: true, clients: clientCount });
   });
 
   // MQTT Client Disconnected
   aedes.on("clientDisconnect", (client) => {
     console.log("[MQTT] ❌ Client DISCONNECTED:", client.id);
-    const clientCount = Math.max(0, Object.keys(aedes.clients).length - 1);
+    const clientCount = aedes.connectedClients;
+    console.log("[MQTT] 👥 Total clients remaining:", clientCount);
     io.emit("mqttStatus", { connected: clientCount > 0, clients: clientCount });
   });
 
@@ -43,8 +44,17 @@ const startBroker = (io, onDataReceived) => {
       if (data.id && data.value !== undefined) {
         const val = parseFloat(data.value);
 
-        // 1. Save to Database
-        await db.saveReading(data.id, val);
+        // Calculate Status based on basic thresholds (consistent with index.js logic)
+        // Note: In a production app, we'd fetch actual thresholds from the DB
+        let status = "normal";
+        if (data.id === "dht_temp") {
+          status = val >= 40 ? "critical" : val >= 32 ? "warning" : "normal";
+        } else if (data.id === "dht_humid") {
+          status = val >= 80 ? "critical" : val >= 70 ? "warning" : "normal";
+        }
+
+        // 1. Save to Database with Status
+        await db.saveReading(data.id, val, status);
 
         // 2. Broadcast to frontend via Socket.io
         io.emit("hardwareSensorData", {
@@ -76,4 +86,8 @@ const startBroker = (io, onDataReceived) => {
   });
 };
 
-module.exports = { startBroker };
+const getClientCount = () => {
+  return aedes.connectedClients;
+};
+
+module.exports = { startBroker, getClientCount };

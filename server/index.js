@@ -145,10 +145,8 @@ app.put("/api/alerts/:id", authenticateToken, async (req, res) => {
 });
 
 app.get("/api/mqtt/status", authenticateToken, (req, res) => {
-  // Aedes is internal to the mqtt.js module,
-  // but for simplicity we can return a generic state or export a getter.
-  // For now, let's just return a placeholder that App.tsx can use.
-  res.json({ connected: true, clients: 1 }); // Assume 1 if checking
+  const clients = mqtt.getClientCount();
+  res.json({ connected: clients > 0, clients: clients });
 });
 
 app.get("/api/sensors/history", authenticateToken, async (req, res) => {

@@ -26,7 +26,7 @@ const ensureSensor = async (sensor) => {
 };
 
 // Save reading
-const saveReading = async (sensorId, value, status) => {
+const saveReading = async (sensorId, value, status = "normal") => {
   try {
     await query("INSERT INTO readings (sensor_id, value, status) VALUES ($1, $2, $3)", [sensorId, value, status]);
   } catch (err) {
