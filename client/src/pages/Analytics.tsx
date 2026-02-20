@@ -6,7 +6,7 @@ import { socket } from "../socket";
 import type { SensorData } from "../types/sensor";
 import { utils, writeFile } from "xlsx";
 import { jsPDF } from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 import { unparse } from "papaparse";
 
 export const Analytics = () => {
@@ -114,7 +114,7 @@ export const Analytics = () => {
 
     const tableData = historyData.slice(0, 20).map((d) => [new Date(d.timestamp).toLocaleString(), d.id, d.value.toString()]);
 
-    (doc as any).autoTable({
+    autoTable(doc, {
       head: [["Timestamp", "Sensor ID", "Value"]],
       body: tableData,
       startY: 30,
