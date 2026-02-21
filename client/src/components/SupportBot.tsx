@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { MessageSquare, X, Send, Github, Info, Activity, Terminal, ChevronRight } from "lucide-react";
+import { MessageSquare, X, Send, Terminal, ChevronRight } from "lucide-react";
 
 interface Message {
   id: string;
@@ -11,7 +11,6 @@ interface Message {
 export const SupportBot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [inputValue, setInputValue] = useState("");
   useEffect(() => {
     console.log("🤖 ForgeBot Kernel Initialized...");
   }, []);
