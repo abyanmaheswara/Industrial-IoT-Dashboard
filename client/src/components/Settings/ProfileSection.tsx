@@ -62,8 +62,8 @@ export const ProfileSection: React.FC = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-      alert("Security Restriction: Payload exceeds 2.0MB limit");
+    if (file.size > 10 * 1024 * 1024) {
+      alert("Batasan Keamanan: Ukuran file melebihi batas 10.0MB");
       return;
     }
 
