@@ -16,6 +16,7 @@ export const SupportBot: React.FC = () => {
     console.log("🤖 ForgeBot Kernel Initialized...");
   }, []);
 
+  const scrollRef = useRef<HTMLDivElement>(null);
   const initialMessages: Message[] = [
     {
       id: "1",
