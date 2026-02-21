@@ -2,7 +2,6 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
-import { SupportBot } from "../SupportBot";
 
 const MainLayout: React.FC<{ children?: React.ReactNode; mqttStatus?: { connected: boolean; clients: number } }> = ({ children, mqttStatus }) => {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
@@ -21,8 +20,6 @@ const MainLayout: React.FC<{ children?: React.ReactNode; mqttStatus?: { connecte
           {children || <Outlet />}
         </main>
       </div>
-
-      <SupportBot />
     </div>
   );
 };

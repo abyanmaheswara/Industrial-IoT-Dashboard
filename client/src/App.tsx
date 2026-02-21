@@ -19,6 +19,7 @@ import { Settings } from "./pages/Settings";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
 import { NotificationSystem } from "./components/NotificationSystem";
+import { SupportBot } from "./components/SupportBot";
 
 // Component to handle Socket & Data when Authenticated
 const DashboardData = () => {
@@ -195,6 +196,7 @@ function App() {
             </Route>
           </Route>
         </Routes>
+        <SupportBot />
       </Router>
     </AuthProvider>
   );

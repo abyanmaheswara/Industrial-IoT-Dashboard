@@ -12,7 +12,9 @@ export const SupportBot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
-  const scrollRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    console.log("🤖 ForgeBot Kernel Initialized...");
+  }, []);
 
   const initialMessages: Message[] = [
     {
