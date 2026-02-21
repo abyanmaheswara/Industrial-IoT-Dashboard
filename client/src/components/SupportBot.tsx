@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { MessageSquare, X, Send, Terminal, ChevronRight, Cpu, Zap, Radio } from "lucide-react";
+import { MessageSquare, X, Terminal, Cpu, Zap, Radio } from "lucide-react";
 
 interface Message {
   id: string;
