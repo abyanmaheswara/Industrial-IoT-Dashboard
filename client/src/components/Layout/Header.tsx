@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { Bell, Settings as SettingsIcon, AlertTriangle, LogOut, ChevronDown } from "lucide-react";
+import { Bell, Settings as SettingsIcon, AlertTriangle, LogOut, ChevronDown, Menu } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { socket } from "../../socket";
 
@@ -14,7 +14,7 @@ interface Alert {
   time?: string; // Optional for display
 }
 
-export function Header({ mqttStatus }: { mqttStatus?: { connected: boolean; clients: number } }) {
+export function Header({ mqttStatus, toggleSidebar }: { mqttStatus?: { connected: boolean; clients: number }; toggleSidebar?: () => void }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [avatar, setAvatar] = useState<string | null>(null);
@@ -91,21 +91,25 @@ export function Header({ mqttStatus }: { mqttStatus?: { connected: boolean; clie
   }, []);
 
   return (
-    <header className="h-20 bg-industrial-900/80 backdrop-blur-2xl border-b border-industrial-700/50 flex items-center justify-between px-10 relative z-30 shadow-2xl">
+    <header className="h-20 bg-industrial-900/80 backdrop-blur-2xl border-b border-industrial-700/50 flex items-center justify-between px-4 lg:px-10 relative z-30 shadow-2xl">
       <div className="absolute inset-0 bg-gradient-to-r from-brand-main/[0.03] to-transparent pointer-events-none" />
 
-      <div className="flex items-center gap-8 relative z-10">
+      <div className="flex items-center gap-2 lg:gap-8 relative z-10">
+        <button onClick={toggleSidebar} className="lg:hidden p-2 text-industrial-400 hover:text-white bg-white/[0.03] border border-white/5 rounded-xl">
+          <Menu size={20} />
+        </button>
+
         <div className="flex flex-col border-l-2 border-brand-main/30 pl-4 py-1">
           <div className="flex items-center gap-2 mb-1">
             <div className="w-1.5 h-1.5 rounded-full bg-brand-main pulse-status" />
             <span className="text-[12px] font-black text-white tracking-[0.3em] uppercase font-mono">{currentTime.toLocaleTimeString("en-US", { hour12: false })}</span>
-            {user?.role === "viewer" && <span className="ml-4 px-2 py-0.5 bg-brand-main/10 border border-brand-main/30 text-brand-main text-[8px] font-black uppercase tracking-[0.2em] animate-pulse">Demo_Access_Active</span>}
+            {user?.role === "viewer" && <span className="ml-2 lg:ml-4 px-2 py-0.5 bg-brand-main/10 border border-brand-main/30 text-brand-main text-[8px] font-black uppercase tracking-[0.2em] animate-pulse">Demo_Access_Active</span>}
           </div>
           <span className="text-[9px] text-industrial-500 font-bold uppercase tracking-[0.2em]">Sector_07 // Operational Sync</span>
         </div>
       </div>
 
-      <div className="flex items-center gap-8 relative z-10">
+      <div className="flex items-center gap-2 lg:gap-8 relative z-10">
         {/* Network Uplink Status */}
         <div className="hidden lg:flex items-center gap-4 px-5 py-2.5 bg-industrial-950/40 border border-brand-main/10 rounded-xl group hover:border-brand-main/20 transition-all cursor-default shadow-inner">
           <div className={`w-2 h-2 ${mqttStatus?.connected ? "bg-emerald-500" : "bg-red-500"} rounded-full pulse-status`} />
@@ -119,20 +123,20 @@ export function Header({ mqttStatus }: { mqttStatus?: { connected: boolean; clie
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setShowDropdown(!showDropdown)}
-            className={`relative p-3 rounded-xl border transition-all duration-300 ${
+            className={`relative p-2.5 lg:p-3 rounded-xl border transition-all duration-300 ${
               showDropdown ? "bg-brand-main/10 border-brand-main/40 text-brand-light shadow-[0_0_25px_rgba(180,83,9,0.2)]" : "text-industrial-400 border-white/5 hover:border-brand-main/20 hover:text-white hover:bg-white/[0.03]"
             }`}
           >
-            <Bell size={20} className={unreadCount > 0 ? "animate-float" : ""} />
+            <Bell size={18} className={unreadCount > 0 ? "animate-float" : ""} />
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-brand-main text-white text-[10px] font-black rounded-lg flex items-center justify-center border-2 border-industrial-900 shadow-xl">
+              <span className="absolute -top-1 -right-1 w-4 h-4 lg:w-5 lg:h-5 bg-brand-main text-white text-[8px] lg:text-[10px] font-black rounded-lg flex items-center justify-center border-2 border-industrial-900 shadow-xl">
                 {unreadCount > 9 ? "9+" : unreadCount}
               </span>
             )}
           </button>
 
           {showDropdown && (
-            <div className="absolute right-0 mt-6 w-96 bg-industrial-950/95 backdrop-blur-3xl border border-white/10 rounded-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-4 duration-500 shadow-[0_30px_100px_rgba(0,0,0,0.95)]">
+            <div className="absolute right-0 mt-6 w-[calc(100vw-2rem)] sm:w-96 bg-industrial-950/95 backdrop-blur-3xl border border-white/10 rounded-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-4 duration-500 shadow-[0_30px_100px_rgba(0,0,0,0.95)]">
               <div className="h-1.5 w-full bg-gradient-to-r from-transparent via-brand-main to-transparent opacity-50" />
 
               <div className="p-5 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
@@ -200,13 +204,16 @@ export function Header({ mqttStatus }: { mqttStatus?: { connected: boolean; clie
         </div>
 
         {/* Profile Control */}
-        <div className="relative" ref={profileRef} style={{ marginLeft: "1rem" }}>
-          <button onClick={() => setShowProfileDropdown(!showProfileDropdown)} className={`flex items-center gap-4 pl-8 border-l border-industrial-700/50 group transition-all duration-300 ${showProfileDropdown ? "scale-[1.03]" : ""}`}>
+        <div className="relative" ref={profileRef} style={{ marginLeft: "0.5rem" }}>
+          <button
+            onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+            className={`flex items-center gap-2 lg:gap-4 pl-4 lg:pl-8 border-l border-industrial-700/50 group transition-all duration-300 ${showProfileDropdown ? "scale-[1.03]" : ""}`}
+          >
             <div className="relative">
-              <div className="w-11 h-11 bg-industrial-950 border-2 border-industrial-800 rounded-2xl flex items-center justify-center overflow-hidden shadow-xl group-hover:border-brand-main/50 transition-all">
+              <div className="w-9 h-9 lg:w-11 lg:h-11 bg-industrial-950 border-2 border-industrial-800 rounded-2xl flex items-center justify-center overflow-hidden shadow-xl group-hover:border-brand-main/50 transition-all">
                 {avatar ? <img src={avatar} alt="Profile" className="w-full h-full object-cover" /> : <span className="text-brand-main font-black text-lg">{user?.username?.charAt(0).toUpperCase()}</span>}
               </div>
-              <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-industrial-900 shadow-md" />
+              <div className="absolute -bottom-1 -right-1 w-3 h-3 lg:w-3.5 lg:h-3.5 bg-emerald-500 rounded-full border-2 border-industrial-900 shadow-md" />
             </div>
 
             <div className="hidden md:block text-left">

@@ -44,7 +44,7 @@ export const Overview: React.FC<OverviewProps> = ({ sensorData, powerHistory, al
   }, [sensorData]);
 
   return (
-    <div className="px-10 py-10 h-full overflow-y-auto custom-scrollbar relative">
+    <div className="px-4 lg:px-10 py-6 lg:py-10 h-full overflow-y-auto custom-scrollbar relative">
       <div className="industrial-grid-premium absolute inset-0 opacity-[0.03] pointer-events-none" />
 
       {/* 1. TELEMETRIC KPI BAR */}

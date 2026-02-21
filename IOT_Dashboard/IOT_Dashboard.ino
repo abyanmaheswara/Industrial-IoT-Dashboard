@@ -1,6 +1,10 @@
 #include <WiFi.h>
-#include <PubSubClient.h>
 #include <DHT.h>
+
+// --- BUFFER OVERRIDE (CRITICAL FOR JWT) ---
+// Default PubSubClient buffer is 256. JWT tokens are long.
+#define MQTT_MAX_PACKET_SIZE 1024 
+#include <PubSubClient.h> // Include AFTER defining buffer size
 
 // ==========================================
 // --- FACTORY FORGE - EDGE NODE FIRMWARE ---
@@ -11,20 +15,15 @@ const char* ssid = "OPPO Reno8";
 const char* password = "12345678";        
 
 // --- PROTOCOL CONFIGURATION (MQTT) ---
-const char* mqtt_server = "industrial-iot-dashboard-production.up.railway.app"; 
-const int mqtt_port = 1883;
+const char* mqtt_server = "shuttle.proxy.rlwy.net"; 
+const int mqtt_port = 36414;
 
 // --- SECURITY PROTOCOL (CREDENTIALS) ---
-// Login dulu di web factoryforge.vercel.app, terus ambil Token & ID-nya
-const char* mqtt_user = "3"; // Sesuaikan dengan ID abang (biasanya 1 atau 3)
-const char* mqtt_pass = "PASTE_TOKEN_JWT_DARI_LOCAL_STORAGE_DI_SINI"; 
-
-// --- SECURITY PROTOCOL (CREDENTIALS) ---
-// [IMPORTANT] User ID abang adalah 3 (diliat dari isi token tadi)
-const char* mqtt_user = "3"; 
-
-// [IMPORTANT]
-const char* mqtt_pass = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJhYnlhbiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3MTU5NzUyMSwiZXhwIjoxNzcxNjgzOTIxfQ.bumZyq14JCbbL6-E93q9yFB8BKPCINkBAQwStN6ePDg";  
+// 1. Ambil User ID & Token dari web factoryforge.vercel.app
+// 2. Klik kanan di dashboard -> Inspect -> Application -> Local Storage
+// 3. User ID bisa diliat di logs (tadi User 1) atau di menu Profile
+const char* mqtt_user = "1"; // SESUAIKAN DENGAN ID ABANG (biasanya 1)
+const char* mqtt_pass = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhYnlhbiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3MTYxMDM0NiwiZXhwIjoxNzcxNjk2NzQ2fQ.MM82XjgzWxe8n9ODfs4QGOF78cqLgEMYmgi0sor1Wtc"; 
 
 // --- TOPICS (AUTOMATIC ISOLATION) ---
 const String base_topic = "factory/" + String(mqtt_user) + "/sensors/";
@@ -99,7 +98,8 @@ void reconnect() {
     // Connect syntax: client.connect(id, user, pass)
     if (client.connect(clientId.c_str(), mqtt_user, mqtt_pass)) {
       Serial.println("CONNECTED ✅");
-      Serial.printf("[INFO] Passport: User %s Secured\n", mqtt_user);
+      Serial.printf("[INFO] Passport Success: User ID [%s] is Secure\n", mqtt_user);
+      Serial.printf("[INFO] Client ID: %s\n", clientId.c_str());
       
       // Subscribe to commands for this specific user
       client.subscribe(cmd_topic.c_str());
@@ -127,6 +127,7 @@ void setup() {
   setup_wifi();
   client.setServer(mqtt_server, mqtt_port);
   client.setCallback(callback);
+  client.setSocketTimeout(30); // Allow more time for JWT handshake over proxy
   
   Serial.println("[INIT] System initialization complete");
   Serial.println("[READY] Listening for Command Uplinks...\n");

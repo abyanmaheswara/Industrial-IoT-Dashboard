@@ -1,15 +1,20 @@
 import { NavLink } from "react-router-dom";
 import LogoWithText from "../LogoWithText";
-import { LayoutDashboard, BarChart2, Bell, Settings } from "lucide-react";
+import { LayoutDashboard, BarChart2, Bell, Settings, X } from "lucide-react";
 
-export function Sidebar({ mqttStatus }: { mqttStatus?: { connected: boolean; clients: number } }) {
+export function Sidebar({ mqttStatus, isMobileOpen, toggleSidebar }: { mqttStatus?: { connected: boolean; clients: number }; isMobileOpen?: boolean; toggleSidebar?: () => void }) {
   return (
-    <aside className="w-64 bg-industrial-900 border-r border-industrial-700/50 flex flex-col relative z-20 transition-all duration-500 group">
+    <aside
+      className={`fixed lg:static inset-y-0 left-0 w-64 bg-industrial-900 border-r border-industrial-700/50 flex flex-col z-50 lg:z-20 transition-all duration-500 lg:translate-x-0 ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}`}
+    >
       <div className="scanline-premium opacity-[0.03]" />
 
       {/* Logo Container */}
-      <div className="p-8 relative">
+      <div className="p-8 relative flex items-center justify-between">
         <LogoWithText size="md" />
+        <button onClick={toggleSidebar} className="lg:hidden p-2 text-industrial-400 hover:text-white">
+          <X size={20} />
+        </button>
         <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-brand-main/20 to-transparent" />
       </div>
 
@@ -25,6 +30,11 @@ export function Sidebar({ mqttStatus }: { mqttStatus?: { connected: boolean; cli
             key={item.to}
             to={item.to}
             end={item.to === "/"}
+            onClick={() => {
+              if (window.innerWidth < 1024 && toggleSidebar) {
+                toggleSidebar();
+              }
+            }}
             className={({ isActive }) =>
               `flex items-center gap-4 px-5 py-3.5 rounded-xl transition-all duration-300 group/nav relative overflow-hidden ${
                 isActive ? "bg-brand-main/10 text-brand-light border border-brand-main/30 shadow-[0_0_20px_rgba(180,83,9,0.1)]" : "text-industrial-400 hover:text-white hover:bg-white/[0.02]"

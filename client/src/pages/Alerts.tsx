@@ -94,7 +94,7 @@ export const Alerts: React.FC = () => {
   }, [fetchAlerts]);
 
   return (
-    <div className="px-10 py-10 h-full overflow-y-auto custom-scrollbar relative">
+    <div className="px-4 lg:px-10 py-6 lg:py-10 h-full overflow-y-auto custom-scrollbar relative">
       <div className="industrial-grid-premium absolute inset-0 opacity-[0.03] pointer-events-none" />
 
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10 relative z-10">
